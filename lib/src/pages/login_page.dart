@@ -20,20 +20,18 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const SizedBox(height: 50),
-                _header(context),
-                const SizedBox(height: 50),
-                _inputField(context),
-                _forgotPassword(context),
-                const SizedBox(height: 20),
-                _signup(context),
-              ],
-            ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 50),
+              _header(context),
+              const SizedBox(height: 50),
+              _inputField(context),
+              _forgotPassword(context),
+              const SizedBox(height: 20),
+              _signup(context),
+            ],
           ),
         ),
       ),
@@ -67,28 +65,53 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Campo de texto para el DNI
         TextField(
           controller: dniController,
-          decoration: const InputDecoration(
+          keyboardType: TextInputType.number, // Teclado numérico para el DNI
+          decoration: InputDecoration(
             hintText: "DNI",
-            prefixIcon: Icon(Icons.badge),
+            prefixIcon: const Icon(Icons.badge),
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
         const SizedBox(height: 10),
+        // Campo de texto para la contraseña
         TextField(
           controller: passwordController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: "Contraseña",
-            prefixIcon: Icon(Icons.password),
+            prefixIcon: const Icon(Icons.password),
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
           ),
-          obscureText: true,
+          obscureText: true, // Para ocultar la contraseña
         ),
         const SizedBox(height: 20),
+        // Botón de inicio de sesión
         ElevatedButton(
           onPressed: () async {
-            await _login(); // Llamamos al método _login
+            await _login();
           },
-          child: const Text("Iniciar sesión"),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: const Text(
+            "Iniciar sesión",
+            style: TextStyle(fontSize: 18),
+          ),
         ),
       ],
     );
@@ -130,27 +153,25 @@ class _LoginPageState extends State<LoginPage> {
     // Intentamos obtener el usuario desde la base de datos
     var userData = await dbHelper.loginUser(dni, password);
     if (userData != null) {
-    final userId = userData['id'];
-    // Guardas el userId en el almacenamiento local, como en SharedPreferences, si es necesario
-    await saveUserId(userId);
+      final userId = userData['id'];
+      // Guardamos el userId en SharedPreferences
+      await saveUserId(userId);
       User user = User.fromMap(userData);
-      if (user.userType == 'admin'){
+      if (user.userType == 'admin') {
         Navigator.pushNamed(context, 'admin');
-      }
-      else{
+      } else {
         Navigator.pushNamed(context, 'home');
       }
     } else {
-      // Login fallido, mostrar error
+      // Mostrar error si el login falla
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dni o contraseña incorrectos')),
+        const SnackBar(content: Text('DNI o contraseña incorrectos')),
       );
     }
   }
 
-
   Future<void> saveUserId(int userId) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('userId', userId);
-}
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('userId', userId);
+  }
 }

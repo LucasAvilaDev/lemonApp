@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../db_test.dart';
+import 'recomendaciones_widget.dart';
 import 'select_plan_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,8 +16,8 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final DBHelper _dbHelper = DBHelper();
   Map<String, dynamic>? suscripciones;
-  final int _clasesTotales = 0;
-  final int _clasesRestantes = 0;
+  int _clasesTotales = 0;
+  int _clasesRestantes = 0;
 
   @override
   void initState() {
@@ -24,20 +25,29 @@ class HomePageState extends State<HomePage> {
     _loadClases(); // Cargar las clases del usuario al inicializar
   }
 
+  bool isLoading = true;
   Future<void> _loadClases() async {
-    var userId = await getUserId();
-    /*
-    var suscripciones = await _dbHelper.getActiveSubscription(userId!);
-    if (suscripciones != null){
+  setState(() {
+    isLoading = true;
+  });
+  var userId = await getUserId();
+  var suscripciones = await _dbHelper.getActiveSubscription(userId!);
+
+  if (suscripciones != null) {
     var plan = await _dbHelper.getPlanById(suscripciones['plan_id']);
-      setState(() {
-        suscripciones = suscripciones;
-        _clasesTotales = plan?['class_quantity'];
-        _clasesRestantes = suscripciones!['remaining_classes'];
-      });
-    }
-    */
+    setState(() {
+      this.suscripciones = suscripciones;
+      _clasesTotales = plan?['class_quantity'] ?? 0;
+      _clasesRestantes = suscripciones['remaining_classes'] ?? 0;
+      isLoading = false;
+    });
+  } else {
+    setState(() {
+      this.suscripciones = null;
+      isLoading = false;
+    });
   }
+}
 
   Future<int?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,10 +55,8 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget _buildMisClasesCard() {
-    if (suscripciones == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
+  if (suscripciones == null) {
+    // Mostrar la tarjeta de compra si no hay suscripciones
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -58,36 +66,11 @@ class HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Mis Clases',
+              'No tienes suscripciones activas',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(
-              borderRadius: const BorderRadius.all(Radius.circular(50)),
-              minHeight: 8,
-              value: _clasesRestantes / _clasesTotales,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF13212E),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Restantes: $_clasesRestantes',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Total: $_clasesTotales',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ],
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -112,6 +95,74 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  // Si hay suscripciones, mostrar la tarjeta con la barra de progreso
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Mis Clases',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            borderRadius: const BorderRadius.all(Radius.circular(50)),
+            minHeight: 8,
+            value: _clasesTotales > 0
+                ? _clasesRestantes / _clasesTotales
+                : 0, // Asegurarse de que no divida por cero
+            backgroundColor: Colors.grey[300],
+            valueColor: const AlwaysStoppedAnimation<Color>(
+              Color(0xFF13212E),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Restantes: $_clasesRestantes',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Total: $_clasesTotales',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SelectPlanPage(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF13212E),
+            ),
+            child: const Text(
+              'Comprar clases',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 
 @override
 Widget build(BuildContext context) {
@@ -158,6 +209,7 @@ Widget build(BuildContext context) {
               const SizedBox(height: 16),
               _buildSectionTitle('Recomendaciones'),
               const SizedBox(height: 16),
+              _buildRecomendacionesCarousel(),              
             ],
           ),
         ),
@@ -204,6 +256,15 @@ Widget _buildSectionTitle(String title) {
         trailing: const Icon(Icons.keyboard_arrow_right_rounded),
         onTap: () {},
       ),
+    );
+  }
+
+    Widget _buildRecomendacionesCarousel() {
+    // Aquí simplemente devuelve el widget que creaste para mostrar el carrusel de recomendaciones
+    return const SizedBox(
+      
+      height: 150, // Ajusta la altura según necesites
+      child: RecomendacionesWidget(),  // Utiliza la página de recomendaciones que creaste
     );
   }
 }

@@ -51,31 +51,31 @@ class DBHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name VARCHAR(100) NOT NULL,
       class_quantity INT DEFAULT 0 CHECK (class_quantity >= 0),
-      price DECIMAL(10, 2) CHECK (price >= 0)
+      price DOUBLE(10, 2) CHECK (price >= 0)
     )
     ''');
 
     // Insertar algunos planes por defecto
     await db.insert('plan', {
-      'name': '4 clases',
+      'name': 'Fit Express',
       'class_quantity': 4,
       'price': 8000,
     });
 
     await db.insert('plan', {
-      'name': '8 clases',
+      'name': 'Power Boost',
       'class_quantity': 8,
       'price': 10000,
     });
 
     await db.insert('plan', {
-      'name': '12 clases',
+      'name': 'Super Fit',
       'class_quantity': 12,
       'price': 12000,
     });
 
     await db.insert('plan', {
-      'name': '20 clases',
+      'name': 'Ultimate Warrior',
       'class_quantity': 20,
       'price': 14000,
     });

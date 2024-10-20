@@ -4,13 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../db_test.dart';
 
 class ConfirmPurchasePage extends StatelessWidget {
-  final int planId;  // Agregamos planId
+  final int planId; // Agregamos planId
   final String abono;
   final double price;
 
   const ConfirmPurchasePage({
     super.key,
-    required this.planId,  // Agregamos el parámetro planId
+    required this.planId, // Agregamos el parámetro planId
     required this.abono,
     required this.price,
   });
@@ -37,9 +37,9 @@ class ConfirmPurchasePage extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Plan adquirido exitosamente')),
                 );
-
                 // Volver al home o a la página que desees
-                Navigator.popUntil(context, ModalRoute.withName('/home'));
+                Navigator.pushNamedAndRemoveUntil(
+                    context, 'home', (Route<dynamic> route) => false);
               },
               child: const Text('Confirmar compra'),
             ),
@@ -56,8 +56,7 @@ class ConfirmPurchasePage extends StatelessWidget {
   }
 
   Future<int?> getUserId() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getInt('userId');
-}
-
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId');
+  }
 }
