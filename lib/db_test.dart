@@ -110,7 +110,7 @@ class DBHelper {
     return await db.query('users', where: 'dni = ?', whereArgs: [dni]);
   }
 
-  // Método para obtener usuario por DNI
+  // Método para obtener usuario por id
   Future<Map<String, Object?>?> getUserById(int id) async {
   final db = await database;
   var result = await db.query('users', where: 'id = ?', whereArgs: [id]);

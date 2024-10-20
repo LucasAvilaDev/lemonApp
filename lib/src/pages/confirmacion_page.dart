@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../db_test.dart';
 
 class ConfirmPurchasePage extends StatelessWidget {
@@ -24,11 +23,51 @@ class ConfirmPurchasePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Plan seleccionado: $abono'),
-            Text('Precio: \$$price'),
+            // Tarjeta que muestra la información del plan
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Plan seleccionado:',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      abono,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Precio:',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '\$$price',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
+            // Botón de confirmar compra
             ElevatedButton(
               onPressed: () async {
                 var userId = await getUserId();
@@ -41,7 +80,17 @@ class ConfirmPurchasePage extends StatelessWidget {
                 Navigator.pushNamedAndRemoveUntil(
                     context, 'home', (Route<dynamic> route) => false);
               },
-              child: const Text('Confirmar compra'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.green, // Color del botón
+              ),
+              child: const Text(
+                'Confirmar compra',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
           ],
         ),
