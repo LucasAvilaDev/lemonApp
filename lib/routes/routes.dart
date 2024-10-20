@@ -3,6 +3,7 @@ import '../src/pages/login_page.dart';
 import '../src/pages/admin_page.dart';
 import '../src/pages/credencial_page.dart';
 import '../src/pages/my_home_page.dart';
+import '../src/pages/perfil_page.dart';
 import '../src/pages/select_plan_page.dart';
 import '../src/pages/signup_page.dart';
 
@@ -14,6 +15,8 @@ Map<String, WidgetBuilder> getAplicationRoutes() {
     'admin': (BuildContext context) => const AdminPage(),
     'home': (BuildContext context) => const MyHomePage(),
     'selectPlan': (BuildContext context) => const SelectPlanPage(),
+    'userProfile': (BuildContext context) => UserProfilePage(),
+
 
         };
 }

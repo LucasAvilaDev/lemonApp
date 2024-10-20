@@ -72,10 +72,12 @@ class _AdminPageState extends State<AdminPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Barra de búsqueda
             TextField(
+              keyboardType: TextInputType.number,
               controller: _searchController,
               decoration: const InputDecoration(
                 labelText: 'Buscar usuario por DNI',
@@ -88,25 +90,27 @@ class _AdminPageState extends State<AdminPage> {
             // Botón de búsqueda
             ElevatedButton(
               onPressed: _searchUser,
-              child: const Text('Buscar'),
+              style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-
-            const SizedBox(height: 20),
-
-            // Mostrar imagen capturada
-            _image != null
-                ? Image.file(
-                    _image!,
-                    height: 300,
-                    width: 300,
-                  )
-                : const Text('No hay imagen seleccionada'),
+          ),
+              child: const Text('Buscar'),
+              
+            ),
 
             const SizedBox(height: 20),
 
             // Botón para escanear QR
             ElevatedButton(
               onPressed: _openCamera,
+              style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
               child: const Text('Escanear QR'),
             ),
           ],

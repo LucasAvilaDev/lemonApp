@@ -67,35 +67,34 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         // Campo de texto para el DNI
         TextField(
-          controller: dniController,
-          keyboardType: TextInputType.number, // Teclado numérico para el DNI
-          decoration: InputDecoration(
-            hintText: "DNI",
-            prefixIcon: const Icon(Icons.badge),
-            filled: true,
-            fillColor: Colors.grey[200],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
+                controller: dniController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey[200],
+                  labelText: "DNI",
+                  hintText: "Ingrese su DNI",
+                  prefixIcon: const Icon(Icons.badge),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
         const SizedBox(height: 10),
         // Campo de texto para la contraseña
-        TextField(
-          controller: passwordController,
-          decoration: InputDecoration(
-            hintText: "Contraseña",
-            prefixIcon: const Icon(Icons.password),
-            filled: true,
-            fillColor: Colors.grey[200],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-          ),
-          obscureText: true, // Para ocultar la contraseña
-        ),
+              TextField(
+                controller: passwordController,
+                keyboardType: TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey[200],
+                  labelText: "Contraseña",
+                  hintText: "Ingrese su contraseña",
+                  prefixIcon: const Icon(Icons.lock),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                obscureText: true,
+              ),
         const SizedBox(height: 20),
         // Botón de inicio de sesión
         ElevatedButton(
@@ -158,10 +157,11 @@ class _LoginPageState extends State<LoginPage> {
       await saveUserId(userId);
       User user = User.fromMap(userData);
       if (user.userType == 'admin') {
-        Navigator.pushNamed(context, 'admin');
-      } else {
-        Navigator.pushNamed(context, 'home');
-      }
+  Navigator.pushNamedAndRemoveUntil(context, 'admin', (route) => false);
+} else {
+  Navigator.pushNamedAndRemoveUntil(context, 'home', (route) => false);
+}
+
     } else {
       // Mostrar error si el login falla
       ScaffoldMessenger.of(context).showSnackBar(

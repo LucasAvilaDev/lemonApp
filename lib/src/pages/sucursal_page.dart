@@ -26,7 +26,6 @@ class SucursalesPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFFDCE1E),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -80,7 +79,6 @@ class SucursalesPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFFDCE1E),
                     ),
                   ),
                   const SizedBox(height: 10),

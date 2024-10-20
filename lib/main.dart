@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'routes/routes.dart';
 import 'src/pages/login_page.dart';
 
 void main() {
-  runApp(const GymApp());
+  runApp(const LemonApp());
 }
 
-class GymApp extends StatelessWidget {
-  const GymApp({super.key});
+class LemonApp extends StatelessWidget {
+  const LemonApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,14 +15,23 @@ class GymApp extends StatelessWidget {
       initialRoute: '/',
       routes: getAplicationRoutes(),
       debugShowCheckedModeBanner: false,
-      title: 'Lemon Gym',
+      title: 'Lemon Training Center',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF13212E),
+          seedColor: const Color(0xFF13212E),
+          brightness: Brightness.light, // Forzamos el brillo claro
         ),
-      useMaterial3: true,
+        useMaterial3: true,
       ),
-    home: const LoginPage(), // Cambia 'Juan' por el nombre del usuario
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF13212E),
+          brightness: Brightness.dark, // Forzamos el brillo oscuro
+        ),
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system, // Se ajusta al tema del sistema
+      home: const LoginPage(),
     );
   }
 }

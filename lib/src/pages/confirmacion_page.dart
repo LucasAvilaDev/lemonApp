@@ -23,49 +23,62 @@ class ConfirmPurchasePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Tarjeta que muestra la información del plan
             Card(
-              elevation: 5,
+              elevation:
+                  10, // Aumentar la elevación para una sombra más pronunciada
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius:
+                    BorderRadius.circular(15), // Bordes más redondeados
               ),
+              color: Colors.white, // Color de fondo
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0), // Aumentar el padding
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Plan seleccionado:',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10), // Mayor espacio entre elementos
                     Text(
                       abono,
                       style: const TextStyle(
-                        fontSize: 24,
+                        fontSize: 28, // Aumentar el tamaño del texto
                         fontWeight: FontWeight.bold,
+                        color: Colors
+                            .blueAccent, // Cambiar color para mayor atractivo
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Precio:',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                    const SizedBox(height: 20), // Mayor espacio entre elementos
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Espacio entre texto y precio
+                      children: [
+                        Text(
+                          'Precio:',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                        ),
+                        Text(
+                          '\$$price', // Mostrar el precio
+                          style: const TextStyle(
+                            fontSize: 28, // Aumentar tamaño del precio
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '\$$price',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
             // Botón de confirmar compra
             ElevatedButton(
@@ -85,7 +98,6 @@ class ConfirmPurchasePage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                backgroundColor: Colors.green, // Color del botón
               ),
               child: const Text(
                 'Confirmar compra',

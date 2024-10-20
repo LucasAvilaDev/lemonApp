@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../db_test.dart';
 import 'confirmacion_page.dart';
 
-
 class SelectPlanPage extends StatefulWidget {
-
   const SelectPlanPage({super.key});  // Modificamos el constructor para aceptar userId
 
   @override
@@ -56,11 +53,13 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
 
   Widget _buildPlanCard(BuildContext context, String title, int classQuantity, double price, int planId) {
     return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        title: Text('$title ($classQuantity clases)'),
-        subtitle: Text('\$$price'),
-        trailing: const Icon(Icons.keyboard_arrow_right_rounded),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
         onTap: () {
           // Navegar a la página de confirmación de compra y pasar userId y planId
           Navigator.push(
@@ -74,13 +73,62 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
             ),
           );
         },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Plan: $title',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '$classQuantity clases',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Precio:',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                  ),
+              const SizedBox(height: 10),
+              Text(
+                '\$$price',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: const Icon(Icons.keyboard_arrow_right_rounded),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Future<int?> getUserId() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getInt('userId');
-}
-
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId');
+  }
 }

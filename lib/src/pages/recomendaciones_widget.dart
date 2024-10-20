@@ -25,34 +25,36 @@ class RecomendacionesWidget extends StatelessWidget {
     {
       'title': 'Principio de Sobrecarga',
       'description': 'El esfuerzo debe aumentar progresivamente.',
-      'details':'El organismo sometido a esfuerzos físicos se adapta progresivamente, para soportar esfuerzos o cargas cada vez mayores. Todo ejercicio destinado a desarrollar una cualidad física debe ser suficientemente intenso para que produzca un cambio en el organismo (ley del umbral). Así, ejercicios de baja intensidad no producen mejoras, ejercicios de mediana intensidad no producen mejoras pero sirven para mantener las ya adquiridas, estímulos de intensidad fuerte producen mejoras en el organismo y estímulos de excesiva intensidad pueden provocar daños en el sistema orgánico, sobre todo si se abusa de ellos. Este principio lo que nos viene a decir que para mejorar, el esfuerzo a realizar cada vez ha de ser mayor, tanto en su volumen como en su intensidad. Es decir una persona que está acostumbrada a realizar 20 abdominales, si quiere seguir mejorando su abdomen deberá aumentar la cantidad de abdominales a realizar por ejemplo a 25 o bien realizará esos mismos 20 abdominales pero con una ligera sobrecarga adicional (con un balón medicinal sobre el pecho).'    },
+      'details':
+          'El organismo sometido a esfuerzos físicos se adapta progresivamente, para soportar esfuerzos o cargas cada vez mayores. Todo ejercicio destinado a desarrollar una cualidad física debe ser suficientemente intenso para que produzca un cambio en el organismo (ley del umbral). Así, ejercicios de baja intensidad no producen mejoras, ejercicios de mediana intensidad no producen mejoras pero sirven para mantener las ya adquiridas, estímulos de intensidad fuerte producen mejoras en el organismo y estímulos de excesiva intensidad pueden provocar daños en el sistema orgánico, sobre todo si se abusa de ellos. Este principio lo que nos viene a decir que para mejorar, el esfuerzo a realizar cada vez ha de ser mayor, tanto en su volumen como en su intensidad. Es decir una persona que está acostumbrada a realizar 20 abdominales, si quiere seguir mejorando su abdomen deberá aumentar la cantidad de abdominales a realizar por ejemplo a 25 o bien realizará esos mismos 20 abdominales pero con una ligera sobrecarga adicional (con un balón medicinal sobre el pecho).'
+    },
   ];
+
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
+    return Center(
+      child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 200),
           child: PageView.builder(
             controller: PageController(
-                viewportFraction: 0.85), // Ajusta el espacio entre las tarjetas
+              viewportFraction: 0.80,
+              initialPage:
+                  0, // Asegúrate de que el carrusel comience en la primera tarjeta
+            ),
+            clipBehavior: Clip.none, // Evita que se recorten las tarjetas
             itemCount: recomendaciones.length,
             itemBuilder: (context, index) {
-              var recomendacion = recomendaciones[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  left: index == 0
-                      ? 0
-                      : 8.0, // Sin padding a la izquierda para la primera tarjeta
-                  right: index == recomendaciones.length - 1
-                      ? 0
-                      : 8.0, // Sin padding a la derecha para la última tarjeta
-                ),
-                child: GestureDetector(
-                  onTap: () {
-                    showDetalleRecomendacionDialog(context,
-                        recomendacion['title']!, recomendacion['details']!);
-                  },
+              return GestureDetector(
+                
+                onTap: () {
+                  showDetalleRecomendacionDialog(
+                    context,
+                    recomendaciones[index]['title']!,
+                    recomendaciones[index]['details']!,
+                  );
+                },
+                
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -64,7 +66,7 @@ class RecomendacionesWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            recomendacion['title']!,
+                            recomendaciones[index]['title']!,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -72,7 +74,7 @@ class RecomendacionesWidget extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            recomendacion['description']!,
+                            recomendaciones[index]['description']!,
                             style: const TextStyle(fontSize: 16),
                             textAlign: TextAlign.center,
                           ),
@@ -80,12 +82,9 @@ class RecomendacionesWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
               );
             },
-          ),
-        ),
-      ],
+          )),
     );
   }
 }
@@ -126,7 +125,6 @@ class DetalleRecomendacionDialog extends StatelessWidget {
   }
 }
 
-// Función para mostrar el diálogo
 void showDetalleRecomendacionDialog(
     BuildContext context, String title, String details) {
   showDialog(
