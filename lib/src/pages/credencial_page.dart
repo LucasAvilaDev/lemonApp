@@ -17,10 +17,6 @@ class MiCredencialPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Mi Credencial (QR)',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
             const SizedBox(height: 20),
             // Cargar el QR desde la API de Google Charts
             Image.asset('assets/images/qrcode.png'),

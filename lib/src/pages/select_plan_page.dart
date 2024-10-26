@@ -4,7 +4,7 @@ import '../../db_test.dart';
 import 'confirmacion_page.dart';
 
 class SelectPlanPage extends StatefulWidget {
-  const SelectPlanPage({super.key});  // Modificamos el constructor para aceptar userId
+  const SelectPlanPage({super.key});
 
   @override
   _SelectPlanPageState createState() => _SelectPlanPageState();
@@ -20,7 +20,6 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
     _loadPlans();
   }
 
-  // Cargar los planes desde la base de datos
   Future<void> _loadPlans() async {
     var plans = await _dbHelper.getPlans();
     setState(() {
@@ -33,6 +32,7 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Seleccionar Plan'),
+        backgroundColor: Colors.teal, // Color de la barra superior
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16.0),
@@ -44,7 +44,7 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
             plan['name'],
             plan['class_quantity'],
             plan['price'],
-            plan['id'], // Pasamos el ID del plan
+            plan['id'],
           );
         },
       ),
@@ -53,20 +53,20 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
 
   Widget _buildPlanCard(BuildContext context, String title, int classQuantity, double price, int planId) {
     return Card(
-      elevation: 5,
+      elevation: 6,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
       ),
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      color: Colors.teal[50], // Fondo suave para la tarjeta
+      margin: const EdgeInsets.symmetric(vertical: 12.0),
       child: InkWell(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
         onTap: () {
-          // Navegar a la página de confirmación de compra y pasar userId y planId
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ConfirmPurchasePage(
-                planId: planId,         // Pasamos el ID del plan
+                planId: planId,
                 abono: title,
                 price: price,
               ),
@@ -78,47 +78,56 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Plan: $title',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
+              Row(
+                children: [
+                  Icon(Icons.fitness_center, color: Colors.teal, size: 30), // Icono temático
+                  const SizedBox(width: 10),
+                  Text(
+                    'Plan: $title',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal[800],
+                        ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Text(
-                '$classQuantity clases',
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey,
+                '$classQuantity clases disponibles',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.teal[600],
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Precio:',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal[800],
                         ),
                   ),
-              const SizedBox(height: 10),
-              Text(
-                '\$$price',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
+                  Text(
+                    '\$$price',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
-                child: const Icon(Icons.keyboard_arrow_right_rounded),
+                child: Icon(
+                  Icons.keyboard_arrow_right_rounded,
+                  color: Colors.teal[700],
+                  size: 28,
+                ),
               ),
             ],
           ),

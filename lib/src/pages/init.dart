@@ -5,11 +5,11 @@ import 'horarios_page.dart';
 import 'sucursal_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Init());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Init extends StatelessWidget {
+  const Init({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +19,19 @@ class MyApp extends StatelessWidget {
         useMaterial3: true, // Si usas Material 3
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      home: const BottomBar(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class BottomBar extends StatefulWidget {
+  const BottomBar({super.key});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _BottomBarState createState() => _BottomBarState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _BottomBarState extends State<BottomBar> {
   int currentPageIndex = 0;
 
   // Lista de páginas que se mostrarán

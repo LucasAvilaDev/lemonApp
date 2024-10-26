@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../db_test.dart';
+import 'puntos_page.dart';
 import 'recomendaciones_widget.dart';
 import 'select_plan_page.dart';
 
@@ -58,7 +59,7 @@ class HomePageState extends State<HomePage> {
       // Mostrar la tarjeta de compra si no hay suscripciones
       return Card(
         elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -82,11 +83,9 @@ class HomePageState extends State<HomePage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF13212E),
-
+                  backgroundColor: const Color(0xFF13212E),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
-                  
                   ),
                 ),
                 child: const Text(
@@ -103,18 +102,36 @@ class HomePageState extends State<HomePage> {
     // Si hay suscripciones, mostrar la tarjeta con la barra de progreso
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Mis Clases',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment
+                  .spaceBetween, // Espacio entre "Mis Clases" y el botón
+              children: [
+                const Text(
+                  'Mis Clases',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Acción para navegar al historial
+                  },
+                  child: const Text(
+                    'Ver Historial',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blue, // Color del botón
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             LinearProgressIndicator(
@@ -133,13 +150,13 @@ class HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Restantes: $_clasesRestantes',
+                  '$_clasesRestantes disponibles',
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Total: $_clasesTotales',
+                  '$_clasesTotales',
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w500),
                 ),
@@ -155,15 +172,12 @@ class HomePageState extends State<HomePage> {
                   ),
                 );
               },
-            
               style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF13212E),
-
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  
-                  ),
+                backgroundColor: const Color(0xFF13212E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
+              ),
               child: const Text(
                 'Comprar clases',
                 style: TextStyle(color: Colors.white),
@@ -217,7 +231,10 @@ class HomePageState extends State<HomePage> {
             children: [
               _buildMisClasesCard(),
               const SizedBox(height: 16),
-              _buildSectionTitle('Programa tu próximo entrenamiento'),
+              _buildSectionTitle('Mis Puntos'),
+              _buildMisPuntosCard(),
+              const SizedBox(height: 16),
+              _buildSectionTitle('Programa tus próximos entrenamientos'),
               _buildReservaCard(),
               const SizedBox(height: 16),
               _buildSectionTitle('Recomendaciones'),
@@ -258,15 +275,49 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildReservaCard() {
+  Widget _buildMisPuntosCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: Colors.yellow[700], // Fondo en amarillo para resaltar puntos
       child: ListTile(
-        title: const Text('Reservar turno'),
-        subtitle: const Text('Podes reservar hasta las 23:59h'),
-        trailing: const Icon(Icons.keyboard_arrow_right_rounded),
-        onTap: () {},
+        title: const Text(
+          '5.000',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+        ),
+        leading: const Icon(Icons.star, color: Colors.white, size: 30),
+        trailing:
+            const Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CanjePuntos()),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildReservaCard() {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: Colors.blue[700], // Fondo en azul para diferenciarla
+      child: ListTile(
+        title: const Text(
+          'Programar semana',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.white,
+          ),
+        ),
+        leading: Icon(Icons.edit, color: Colors.white, size: 30),
+        trailing: Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white),
+        onTap: () {
+          Navigator.pushNamed(context, 'programacionClases');
+        },
       ),
     );
   }
@@ -274,6 +325,5 @@ class HomePageState extends State<HomePage> {
   Widget _buildRecomendacionesCarousel() {
     // Aquí simplemente devuelve el widget que creaste para mostrar el carrusel de recomendaciones
     return const RecomendacionesWidget(); // Utiliza la página de recomendaciones que creaste
-    
   }
 }
