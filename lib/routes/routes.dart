@@ -18,7 +18,7 @@ Map<String, WidgetBuilder> getAplicationRoutes() {
     'selectPlan': (BuildContext context) => const SelectPlanPage(),
     
     'userProfile': (BuildContext context) => const UserProfilePage(),
-    'programacionClases': (BuildContext context) => const ProgramacionClasesPage(),
+    'programacionClases': (BuildContext context) => ProgramacionClasesPage(),
 
 
 

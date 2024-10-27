@@ -1,134 +1,119 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../db_test.dart';
+import 'package:intl/intl.dart';
+
 
 class ProgramacionClasesPage extends StatefulWidget {
-  const ProgramacionClasesPage({super.key});
-
   @override
   _ProgramacionClasesPageState createState() => _ProgramacionClasesPageState();
 }
 
 class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
-  List<Map<String, dynamic>> _weekSchedule = [];
+  final DBHelper _dbHelper = DBHelper();
+  List<Map<String, String>> _weekDates = [];
+  Map<String, List<String>> _availableTimes = {};
 
   @override
   void initState() {
     super.initState();
-    _loadJsonData();
+    _weekDates = getMobileWeek(); // Obtener la semana móvil
+    _loadAvailableTimes(); // Cargar horarios disponibles para la semana móvil
   }
 
-Future<void> _loadJsonData() async {
-  final String response = await rootBundle.loadString('assets/week_schedule.json');
-  final List<dynamic> data = json.decode(response);
-
-  setState(() {
-    _weekSchedule = data.map((item) {
-      return {
-        "day": item["day"] as String,
-        "date": item["date"] as String,
-        "available_times": List<String>.from(item["available_times"]),
-      };
-    }).toList();
-  });
-}
-
+  Future<void> _loadAvailableTimes() async {
+    for (var day in _weekDates) {
+      var availableTimes = await _dbHelper.getAvailableTimes(day["date"]!);
+      setState(() {
+        _availableTimes[day["date"]!] = availableTimes.map((e) => e["time"] as String).toList();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Programación de Clases'),
+      appBar: AppBar(title: Text('Programar Clases')),
+      body: ListView.builder(
+        itemCount: _weekDates.length,
+        itemBuilder: (context, index) {
+          final day = _weekDates[index];
+          final times = _availableTimes[day["date"]!] ?? [];
+
+          return Card(
+            elevation: 4,
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: ExpansionTile(
+              title: Text(
+                '${day["day"]} - ${day["date"]}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              children: times.isEmpty
+                  ? [Padding(padding: EdgeInsets.all(8), child: Text("No hay horarios disponibles"))]
+                  : times.map((time) {
+                      return ListTile(
+                        title: Text(time),
+                        trailing: Icon(Icons.add),
+                        onTap: () => _reserveTime(day["date"]!, time),
+                      );
+                    }).toList(),
+            ),
+          );
+        },
       ),
-      body: _weekSchedule.isNotEmpty
-          ? ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: _weekSchedule.length,
-              itemBuilder: (context, index) {
-                var dayInfo = _weekSchedule[index];
-                return _buildDayCard(
-                  dayInfo['day'],
-                  dayInfo['date'],
-                  dayInfo['available_times'],
-                );
-              },
-            )
-          : const Center(child: CircularProgressIndicator()), // Cargando si el JSON aún no se ha cargado
     );
   }
 
-  Widget _buildDayCard(String day, String date, List<String> availableTimes) {
-  // Agrupamos horarios en dos intervalos: Mañana y Tarde
-  List<String> morningTimes = availableTimes.where((time) {
-    final hour = int.parse(time.split(":")[0]);
-    return hour >= 6 && hour < 12;
-  }).toList();
+  Future<void> _reserveTime(String date, String time) async {
 
-  List<String> afternoonTimes = availableTimes.where((time) {
-    final hour = int.parse(time.split(":")[0]);
-    return hour >= 12 && hour < 18;
-  }).toList();
+    int? userId = await getUserId(); // Obtiene el ID de usuario
 
-  return Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    margin: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$day - $date',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 10),
-          if (morningTimes.isNotEmpty) ...[
-            const Text(
-              'Mañana:',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            Wrap(
-              spacing: 8,
-              children: morningTimes.map((time) {
-                return ChoiceChip(
-                  label: Text(time),
-                  selected: false,
-                  onSelected: (selected) {
-                    // Acción para programar el entrenamiento en este horario
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 10),
-          ],
-          if (afternoonTimes.isNotEmpty) ...[
-            const Text(
-              'Tarde:',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            Wrap(
-              spacing: 8,
-              children: afternoonTimes.map((time) {
-                return ChoiceChip(
-                  label: Text(time),
-                  selected: false,
-                  onSelected: (selected) {
-                    // Acción para programar el entrenamiento en este horario
-                  },
-                );
-              }).toList(),
-            ),
-          ],
+    // Confirmación de reserva
+    bool? confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Confirmar Reserva"),
+        content: Text("¿Quieres reservar $time el día $date?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Cancelar")),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text("Confirmar")),
         ],
       ),
-    ),
-  );
+    );
+
+    if (confirmed == true) {
+      // Realizar inserción en la base de datos
+      await _dbHelper.insertReservation(userId!, date, time);
+      setState(() {
+        _availableTimes[date]!.remove(time); // Actualiza los horarios disponibles
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reserva confirmada para $time")));
+    }
+  }
+
+
+  
+  List<Map<String, String>> getMobileWeek() {
+  final List<Map<String, String>> weekDates = [];
+  final now = DateTime.now();
+
+  for (int i = 0; i < 7; i++) {
+    final date = now.add(Duration(days: i));
+    final dayName = DateFormat('EEEE', 'es').format(date);  // Nombre del día en español
+    final dateFormatted = DateFormat('yyyy-MM-dd').format(date);  // Fecha en formato SQL
+
+    weekDates.add({
+      "day": dayName,
+      "date": dateFormatted,
+    });
+  }
+  return weekDates;
 }
 
+
+Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId');
+  }
 }

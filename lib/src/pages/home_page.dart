@@ -58,6 +58,7 @@ class HomePageState extends State<HomePage> {
     if (suscripciones == null) {
       // Mostrar la tarjeta de compra si no hay suscripciones
       return Card(
+        color: Colors.grey[200], // Fondo en amarillo para resaltar puntos
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Padding(
@@ -101,6 +102,8 @@ class HomePageState extends State<HomePage> {
 
     // Si hay suscripciones, mostrar la tarjeta con la barra de progreso
     return Card(
+      color: Colors.grey[200], // Fondo en amarillo para resaltar puntos
+
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
@@ -292,7 +295,7 @@ class HomePageState extends State<HomePage> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CanjePuntos()),
+            MaterialPageRoute(builder: (context) => const CanjePuntos()),
           );
         },
       ),
@@ -313,8 +316,8 @@ class HomePageState extends State<HomePage> {
             color: Colors.white,
           ),
         ),
-        leading: Icon(Icons.edit, color: Colors.white, size: 30),
-        trailing: Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white),
+        leading: const Icon(Icons.edit, color: Colors.white, size: 30),
+        trailing: const Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white),
         onTap: () {
           Navigator.pushNamed(context, 'programacionClases');
         },

@@ -80,7 +80,7 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.fitness_center, color: Colors.teal, size: 30), // Icono temático
+                  const Icon(Icons.fitness_center, color: Colors.teal, size: 30), // Icono temático
                   const SizedBox(width: 10),
                   Text(
                     'Plan: $title',

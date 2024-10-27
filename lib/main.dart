@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'routes/routes.dart';
 import 'src/pages/login_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
+    await initializeDateFormatting('es', null); // Inicializa la localización en español
+
   runApp(const LemonApp());
 }
 
@@ -13,6 +16,7 @@ class LemonApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: '/',
+      
       routes: getAplicationRoutes(),
       debugShowCheckedModeBanner: false,
       title: 'Lemon Training Center',
