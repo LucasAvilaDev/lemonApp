@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'credencial_page.dart';
 import 'home_page.dart';
-import 'horarios_page.dart';
-import 'sucursal_page.dart';
+import 'mis_reservas_page.dart';
+
 
 void main() {
   runApp(const Init());
@@ -38,8 +38,7 @@ class _BottomBarState extends State<BottomBar> {
   final List<Widget> _pages = [
     const HomePage(),
     const MiCredencialPage(),
-    const SucursalesPage(),
-    const HorariosPage(),
+    ScheduledClassesPage()
   ];
 
   @override
@@ -68,14 +67,9 @@ class _BottomBarState extends State<BottomBar> {
             label: 'Mi Credencial',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.location_on),
-            icon: Icon(Icons.location_on_outlined),
-            label: 'Sucursales',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.timer_rounded),
-            icon: Icon(Icons.timer_outlined),
-            label: 'Horarios',
+            selectedIcon: Icon(Icons.calendar_month),
+            icon: Icon(Icons.calendar_month_outlined),
+            label: 'Mis Reservas',
           ),
         ],
       ),

@@ -3,6 +3,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:intl/intl.dart';
 
+import 'src/models/scheduled_model.dart';
+
 // Clase DatabaseHelper que gestiona las operaciones de la base de datos
 class DBHelper {
   // Singleton para la base de datos, asegurándonos que solo se crea una instancia
@@ -120,6 +122,24 @@ current_reservations INT DEFAULT 0
 ''');
 
   }
+
+
+  Future<List<ScheduledClass>> getScheduledClasses(int userId) async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query(
+    'user_reservations',
+    where: 'user_id = ?',
+    whereArgs: [userId],
+  );
+
+  print(maps);
+
+  return List.generate(maps.length, (i) {
+    return ScheduledClass.fromMap(maps[i]);
+  });
+}
+
+
 
   Future<void> initializeAvailableSchedule(Database db) async {
     final count = Sqflite.firstIntValue(
