@@ -107,17 +107,18 @@ current_reservations INT DEFAULT 0
     await initializeAvailableSchedule(db);
 
     await db.execute('''
-user_reservations (
-    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT, -- ID del usuario
-    schedule_id INT, -- ID del horario reservado en la tabla available_schedule
-    reservation_date DATE, -- Fecha de la reserva
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
+  CREATE TABLE user_reservations (
+    reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    schedule_id INTEGER NOT NULL,
+    reservation_date DATE NOT NULL,
+    reservation_time TIME NOT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (schedule_id) REFERENCES available_schedule(id)
-);
-
-
+  );
 ''');
+
   }
 
   Future<void> initializeAvailableSchedule(Database db) async {
@@ -126,182 +127,189 @@ user_reservations (
     if (count == 0) {
       await db.transaction((txn) async {
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '09:00:00'});
+            {'day': 'lunes', 'available_time': '09:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '10:00:00'});
+            {'day': 'lunes', 'available_time': '10:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '11:00:00'});
+            {'day': 'lunes', 'available_time': '11:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '12:00:00'});
+            {'day': 'lunes', 'available_time': '12:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '13:00:00'});
+            {'day': 'lunes', 'available_time': '13:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '14:00:00'});
+            {'day': 'lunes', 'available_time': '14:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '15:00:00'});
+            {'day': 'lunes', 'available_time': '15:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '16:00:00'});
+            {'day': 'lunes', 'available_time': '16:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '17:00:00'});
+            {'day': 'lunes', 'available_time': '17:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '18:00:00'});
+            {'day': 'lunes', 'available_time': '18:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Lunes', 'available_time': '19:00:00'});
+            {'day': 'lunes', 'available_time': '19:00:00'});
         await txn.insert('available_schedule',
             {'day': 'Lunes', 'available_time': '20:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '09:00:00'});
+            {'day': 'martes', 'available_time': '09:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '10:00:00'});
+            {'day': 'martes', 'available_time': '10:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '11:00:00'});
+            {'day': 'martes', 'available_time': '11:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '12:00:00'});
+            {'day': 'martes', 'available_time': '12:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '13:00:00'});
+            {'day': 'martes', 'available_time': '13:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '14:00:00'});
+            {'day': 'martes', 'available_time': '14:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '15:00:00'});
+            {'day': 'martes', 'available_time': '15:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '16:00:00'});
+            {'day': 'martes', 'available_time': '16:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '17:00:00'});
+            {'day': 'martes', 'available_time': '17:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '18:00:00'});
+            {'day': 'martes', 'available_time': '18:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '19:00:00'});
+            {'day': 'martes', 'available_time': '19:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Martes', 'available_time': '20:00:00'});
+            {'day': 'martes', 'available_time': '20:00:00'});
 
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '09:00:00'});
+            {'day': 'miercoles', 'available_time': '09:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '10:00:00'});
+            {'day': 'miercoles', 'available_time': '10:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '11:00:00'});
+            {'day': 'miercoles', 'available_time': '11:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '12:00:00'});
+            {'day': 'miercoles', 'available_time': '12:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '13:00:00'});
+            {'day': 'miercoles', 'available_time': '13:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '14:00:00'});
+            {'day': 'miercoles', 'available_time': '14:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '15:00:00'});
+            {'day': 'miercoles', 'available_time': '15:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '16:00:00'});
+            {'day': 'miercoles', 'available_time': '16:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '17:00:00'});
+            {'day': 'miercoles', 'available_time': '17:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '18:00:00'});
+            {'day': 'miercoles', 'available_time': '18:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '19:00:00'});
+            {'day': 'miercoles', 'available_time': '19:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Miercoles', 'available_time': '20:00:00'});
+            {'day': 'miercoles', 'available_time': '20:00:00'});
 
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '09:00:00'});
+            {'day': 'jueves', 'available_time': '09:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '10:00:00'});
+            {'day': 'jueves', 'available_time': '10:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '11:00:00'});
+            {'day': 'jueves', 'available_time': '11:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '12:00:00'});
+            {'day': 'jueves', 'available_time': '12:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '13:00:00'});
+            {'day': 'jueves', 'available_time': '13:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '14:00:00'});
+            {'day': 'jueves', 'available_time': '14:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '15:00:00'});
+            {'day': 'jueves', 'available_time': '15:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '16:00:00'});
+            {'day': 'jueves', 'available_time': '16:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '17:00:00'});
+            {'day': 'jueves', 'available_time': '17:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '18:00:00'});
+            {'day': 'jueves', 'available_time': '18:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '19:00:00'});
+            {'day': 'jueves', 'available_time': '19:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Jueves', 'available_time': '20:00:00'});
+            {'day': 'jueves', 'available_time': '20:00:00'});
 
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '09:00:00'});
+            {'day': 'viernes', 'available_time': '09:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '10:00:00'});
+            {'day': 'viernes', 'available_time': '10:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '11:00:00'});
+            {'day': 'viernes', 'available_time': '11:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '12:00:00'});
+            {'day': 'viernes', 'available_time': '12:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '13:00:00'});
+            {'day': 'viernes', 'available_time': '13:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '14:00:00'});
+            {'day': 'viernes', 'available_time': '14:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '15:00:00'});
+            {'day': 'viernes', 'available_time': '15:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '16:00:00'});
+            {'day': 'viernes', 'available_time': '16:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '17:00:00'});
+            {'day': 'viernes', 'available_time': '17:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '18:00:00'});
+            {'day': 'viernes', 'available_time': '18:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '19:00:00'});
+            {'day': 'viernes', 'available_time': '19:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Viernes', 'available_time': '20:00:00'});
+            {'day': 'viernes', 'available_time': '20:00:00'});
 
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '09:00:00'});
+            {'day': 'sabado', 'available_time': '09:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '10:00:00'});
+            {'day': 'sabado', 'available_time': '10:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '11:00:00'});
+            {'day': 'sabado', 'available_time': '11:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '12:00:00'});
+            {'day': 'sabado', 'available_time': '12:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '13:00:00'});
+            {'day': 'sabado', 'available_time': '13:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '14:00:00'});
+            {'day': 'sabado', 'available_time': '14:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '15:00:00'});
+            {'day': 'sabado', 'available_time': '15:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '16:00:00'});
+            {'day': 'sabado', 'available_time': '16:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '17:00:00'});
+            {'day': 'sabado', 'available_time': '17:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '18:00:00'});
+            {'day': 'sabado', 'available_time': '18:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '19:00:00'});
+            {'day': 'sabado', 'available_time': '19:00:00'});
         await txn.insert('available_schedule',
-            {'day': 'Sabado', 'available_time': '20:00:00'});
+            {'day': 'sabado', 'available_time': '20:00:00'});
 
         // Continúa insertando el resto de los días de la semana de manera similar
       });
     }
   }
 
-  Future<void> insertReservation(int userId, String date, String time) async {
-    final db = await database;
-    await db.insert('user_reservations', {
-      'user_id': userId, // Cambia 'user_id' por el ID real del usuario
-      'date': date,
-      'day': DateFormat('EEEE', 'es').format(DateTime.parse(date)),
-      'time': time,
-      'status': 'confirmed',
-    });
-  }
+ Future<List<Map<String, dynamic>>> getAvailableSchedules(String date) async {
+  final db = await database;
 
-  Future<List<Map<String, dynamic>>> getAvailableTimes(String date) async {
-    final db = await database;
+  // Obtén el día de la semana de la fecha proporcionada
+  final dayOfWeek = DateFormat('EEEE', 'es').format(DateTime.parse(date));
 
-    // Consulta los horarios de available_schedule que no están en user_reservations para una fecha dada
-    return await db.rawQuery('''
-    SELECT a.day, a.time
+  // Imprime el día para confirmar que es correcto
+  print("Consultando horarios para el día de la semana: $dayOfWeek");
+
+  // Realiza la consulta para obtener horarios disponibles
+  return await db.rawQuery('''
+    SELECT a.day, a.available_time 
     FROM available_schedule a
-    LEFT JOIN user_reservations u
-    ON a.day = u.day AND a.time = u.time AND u.date = ?
-    WHERE u.date IS NULL AND a.day = (SELECT strftime('%w', ?))
-  ''', [date, date]);
-  }
+    WHERE a.day = ?
+  ''', [dayOfWeek]);
+}
+
+
+
+
+Future<void> insertReservation(int userId, String date, String time) async {
+  final db = await database;
+  await db.insert('user_reservations', {
+    'user_id': userId,
+    'reservation_date': date,
+    'reservation_time': time,
+  });
+}
+
+
 
   // Método para insertar un nuevo usuario
   Future<void> insertUser(Map<String, dynamic> user) async {

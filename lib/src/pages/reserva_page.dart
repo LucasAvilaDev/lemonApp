@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 
 class ProgramacionClasesPage extends StatefulWidget {
+  const ProgramacionClasesPage({super.key});
+
   @override
   _ProgramacionClasesPageState createState() => _ProgramacionClasesPageState();
 }
@@ -13,7 +15,7 @@ class ProgramacionClasesPage extends StatefulWidget {
 class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
   final DBHelper _dbHelper = DBHelper();
   List<Map<String, String>> _weekDates = [];
-  Map<String, List<String>> _availableTimes = {};
+  final Map<String, List<String>> _availableTimes = {};
 
   @override
   void initState() {
@@ -24,17 +26,21 @@ class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
 
   Future<void> _loadAvailableTimes() async {
     for (var day in _weekDates) {
-      var availableTimes = await _dbHelper.getAvailableTimes(day["date"]!);
+      var availableTimes = await _dbHelper.getAvailableSchedules(day["date"]!);
+      print(availableTimes);
       setState(() {
-        _availableTimes[day["date"]!] = availableTimes.map((e) => e["time"] as String).toList();
+        _availableTimes[day["date"]!] = availableTimes.map((e) => e["available_time"] as String).toList();
       });
     }
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Programar Clases')),
+      appBar: AppBar(title: const Text('Programar Clases')),
       body: ListView.builder(
         itemCount: _weekDates.length,
         itemBuilder: (context, index) {
@@ -43,18 +49,18 @@ class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
 
           return Card(
             elevation: 4,
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: ExpansionTile(
               title: Text(
                 '${day["day"]} - ${day["date"]}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               children: times.isEmpty
-                  ? [Padding(padding: EdgeInsets.all(8), child: Text("No hay horarios disponibles"))]
+                  ? [const Padding(padding: EdgeInsets.all(8), child: Text("No hay horarios disponibles"))]
                   : times.map((time) {
                       return ListTile(
                         title: Text(time),
-                        trailing: Icon(Icons.add),
+                        trailing: const Icon(Icons.add),
                         onTap: () => _reserveTime(day["date"]!, time),
                       );
                     }).toList(),
@@ -65,32 +71,30 @@ class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
     );
   }
 
-  Future<void> _reserveTime(String date, String time) async {
+  Future<void> _reserveTime(String selectedDate, String selectedTime) async {
+  int? userId = await getUserId();
 
-    int? userId = await getUserId(); // Obtiene el ID de usuario
+  bool? confirmed = await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Confirmar Reserva"),
+      content: Text("¿Quieres reservar $selectedTime el día $selectedDate?"),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancelar")),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Confirmar")),
+      ],
+    ),
+  );
 
-    // Confirmación de reserva
-    bool? confirmed = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Confirmar Reserva"),
-        content: Text("¿Quieres reservar $time el día $date?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Cancelar")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text("Confirmar")),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      // Realizar inserción en la base de datos
-      await _dbHelper.insertReservation(userId!, date, time);
-      setState(() {
-        _availableTimes[date]!.remove(time); // Actualiza los horarios disponibles
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reserva confirmada para $time")));
-    }
+  if (confirmed == true) {
+    await _dbHelper.insertReservation(userId!, selectedDate, selectedTime);
+    setState(() {
+      _availableTimes[selectedDate]!.remove(selectedTime);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reserva confirmada para $selectedTime")));
   }
+}
+
 
 
   
