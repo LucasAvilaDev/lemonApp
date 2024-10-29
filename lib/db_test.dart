@@ -98,12 +98,13 @@ class DBHelper {
 
     await db.execute('''
       CREATE TABLE available_schedule (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    day VARCHAR(20) NOT NULL,
-    available_time TIME NOT NULL,
-max_reservations INT DEFAULT 10,
-current_reservations INT DEFAULT 0
-)
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  day VARCHAR(20) NOT NULL,
+  available_time TIME NOT NULL,
+  max_reservations INTEGER DEFAULT 10,
+  current_reservations INTEGER DEFAULT 0
+);
+
 ''');
 
     await initializeAvailableSchedule(db);
@@ -139,6 +140,35 @@ current_reservations INT DEFAULT 0
   });
 }
 
+  Future<Map<String, dynamic>?> getProximoEntrenamiento(int userId) async {
+    // Obtén la fecha y hora actuales
+    final now = DateTime.now();
+      final db = await database;
+
+
+    // Consulta para obtener la reserva más próxima después de ahora
+    final List<Map<String, dynamic>> result = await db.query(
+      'user_reservations',
+      where: 'user_id = ? AND reservation_date >= ?',
+      whereArgs: [userId, now.toIso8601String()],
+      orderBy: 'reservation_date ASC, reservation_time ASC',
+      limit: 1,
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null; // Si no hay reservas futuras
+  }
+
+  Future<void> deleteScheduledClass(int scheduleId) async {
+  final db = await database; // Asumiendo que tienes tu base de datos inicializada
+  await db.delete(
+    'scheduled_classes', // Nombre de la tabla
+    where: 'schedule_id = ?', // Condición
+    whereArgs: [scheduleId], // Argumento
+  );
+}
 
 
   Future<void> initializeAvailableSchedule(Database db) async {
@@ -300,30 +330,26 @@ current_reservations INT DEFAULT 0
     }
   }
 
- Future<List<Map<String, dynamic>>> getAvailableSchedules(String date) async {
+Future<List<Map<String, dynamic>>> getAvailableSchedules(String day) async {
   final db = await database;
-
-  // Obtén el día de la semana de la fecha proporcionada
-  final dayOfWeek = DateFormat('EEEE', 'es').format(DateTime.parse(date));
-
-  // Imprime el día para confirmar que es correcto
-  print("Consultando horarios para el día de la semana: $dayOfWeek");
-
-  // Realiza la consulta para obtener horarios disponibles
-  return await db.rawQuery('''
-    SELECT a.day, a.available_time 
-    FROM available_schedule a
-    WHERE a.day = ?
-  ''', [dayOfWeek]);
+  return await db.query(
+    'available_schedule',
+    columns: ['id AS schedule_id', 'available_time'], // Asegúrate de incluir 'id' como schedule_id
+    where: 'day = ?',
+    whereArgs: [day],
+  );
 }
 
 
 
 
-Future<void> insertReservation(int userId, String date, String time) async {
+
+
+Future<void> insertReservation(int userId, int scheduleId, String date, String time) async {
   final db = await database;
   await db.insert('user_reservations', {
     'user_id': userId,
+    'schedule_id': scheduleId,
     'reservation_date': date,
     'reservation_time': time,
   });

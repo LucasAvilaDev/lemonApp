@@ -18,14 +18,14 @@ class HomePageState extends State<HomePage> {
   Map<String, dynamic>? suscripciones;
   int _clasesTotales = 0;
   int _clasesRestantes = 0;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadClases(); // Cargar las clases del usuario al inicializar
+    _loadClases();
   }
 
-  bool isLoading = true;
   Future<void> _loadClases() async {
     setState(() {
       isLoading = true;
@@ -54,11 +54,100 @@ class HomePageState extends State<HomePage> {
     return prefs.getInt('userId');
   }
 
+  Future<String> getUserName() async {
+    int? userId = await getUserId();
+
+    if (userId == null) {
+      throw Exception('ID de usuario no disponible');
+    }
+
+    var user = await _dbHelper.getUserById(userId);
+
+    if (user != null && user.containsKey('first_name')) {
+      return user['first_name'] as String;
+    } else {
+      throw Exception('Usuario no encontrado');
+    }
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildProximoEntrenamientoCard() {
+  return FutureBuilder(
+    future: getUserId(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const CircularProgressIndicator(); // Muestra un indicador de carga mientras esperas los datos
+      }
+      
+      if (snapshot.hasError) {
+        return const Text("Error al cargar el próximo entrenamiento");
+      }
+      
+      int? userId = snapshot.data;
+      if (userId == null) {
+        return const Text("Usuario no encontrado");
+      }
+
+      return FutureBuilder(
+        future: _dbHelper.getProximoEntrenamiento(userId),
+        builder: (context, trainingSnapshot) {
+          if (trainingSnapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(); // Indicador de carga mientras espera los datos de entrenamiento
+          }
+          
+          if (trainingSnapshot.hasError) {
+            return const Text("Error al cargar el próximo entrenamiento");
+          }
+
+          var proximoEntrenamiento = trainingSnapshot.data;
+          String message;
+
+          if (proximoEntrenamiento != null) {
+            final fecha = DateTime.parse(proximoEntrenamiento['reservation_date']);
+            final now = DateTime.now();
+            
+            if (fecha.day == now.day && fecha.month == now.month && fecha.year == now.year) {
+              message = "Tu próximo entrenamiento es hoy";
+            } else if (fecha.isAtSameMomentAs(now.add(const Duration(days: 1)))) {
+              message = "Tu próximo entrenamiento es mañana";
+            } else {
+              message = "Tu próximo entrenamiento es el ${fecha.toLocal().toString().split(' ')[0]}";
+            }
+          } else {
+            message = "No olvides programar tus entrenamientos";
+          }
+
+          return Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Colors.purple[100],
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                message,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
   Widget _buildMisClasesCard() {
     if (suscripciones == null) {
-      // Mostrar la tarjeta de compra si no hay suscripciones
       return Card(
-        color: Colors.grey[200], // Fondo en amarillo para resaltar puntos
+        color: Colors.grey[200],
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Padding(
@@ -68,10 +157,7 @@ class HomePageState extends State<HomePage> {
             children: [
               const Text(
                 'No tienes suscripciones activas',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -89,10 +175,7 @@ class HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  'Comprar clases',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: const Text('Comprar clases', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -100,10 +183,8 @@ class HomePageState extends State<HomePage> {
       );
     }
 
-    // Si hay suscripciones, mostrar la tarjeta con la barra de progreso
     return Card(
-      color: Colors.grey[200], // Fondo en amarillo para resaltar puntos
-
+      color: Colors.grey[200],
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
@@ -111,60 +192,20 @@ class HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment
-                  .spaceBetween, // Espacio entre "Mis Clases" y el botón
-              children: [
-                const Text(
-                  'Mis Clases',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Acción para navegar al historial
-                  },
-                  child: const Text(
-                    'Ver Historial',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue, // Color del botón
-                    ),
-                  ),
-                ),
-              ],
+            const Text(
+              'Mis Clases',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             LinearProgressIndicator(
               borderRadius: const BorderRadius.all(Radius.circular(50)),
               minHeight: 8,
-              value: _clasesTotales > 0
-                  ? _clasesRestantes / _clasesTotales
-                  : 0, // Asegurarse de que no divida por cero
+              value: _clasesTotales > 0 ? _clasesRestantes / _clasesTotales : 0,
               backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF13212E),
-              ),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF13212E)),
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '$_clasesRestantes disponibles',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$_clasesTotales',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
+            Text('$_clasesRestantes disponibles de $_clasesTotales'),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
@@ -181,10 +222,7 @@ class HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                'Comprar clases',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text('Comprar clases', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -197,16 +235,14 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: FutureBuilder<String>(
-          future: getUserName(), // Llama a la función asíncrona
+          future: getUserName(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text(
-                  'Cargando...'); // Muestra mientras espera los datos
+              return const Text('Cargando...');
             } else if (snapshot.hasError) {
               return const Text('Error al cargar');
             } else if (snapshot.hasData) {
-              return Text(
-                  '¡Hola, ${snapshot.data}!'); // Muestra el nombre del usuario
+              return Text('¡Hola, ${snapshot.data}!');
             } else {
               return const Text('Usuario no encontrado');
             }
@@ -217,9 +253,7 @@ class HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8.0),
             child: GestureDetector(
               onTap: () {
-                // Aquí navegas a la pantalla de perfil de usuario
-                Navigator.pushNamed(context,
-                    'userProfile'); // Reemplaza 'userProfile' con el nombre de tu ruta
+                Navigator.pushNamed(context, 'userProfile');
               },
               child: const CircleAvatar(child: Icon(Icons.person)),
             ),
@@ -232,6 +266,8 @@ class HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildProximoEntrenamientoCard(),
+              const SizedBox(height: 16),
               _buildMisClasesCard(),
               const SizedBox(height: 16),
               _buildSectionTitle('Mis Puntos'),
@@ -250,48 +286,18 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Future<String> getUserName() async {
-    int? userId = await getUserId(); // Obtiene el ID de usuario
-
-    if (userId == null) {
-      throw Exception('ID de usuario no disponible');
-    }
-
-    var user =
-        await _dbHelper.getUserById(userId); // user es un Map<String, dynamic>
-
-    // Verifica si el mapa contiene la clave que buscas
-    if (user != null && user.containsKey('first_name')) {
-      return user['first_name'] as String; // Asegura que sea un String
-    } else {
-      throw Exception('Usuario no encontrado');
-    }
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-
   Widget _buildMisPuntosCard() {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: Colors.yellow[700], // Fondo en amarillo para resaltar puntos
+      color: Colors.yellow[700],
       child: ListTile(
         title: const Text(
           '5.000',
-          style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
         ),
         leading: const Icon(Icons.star, color: Colors.white, size: 30),
-        trailing:
-            const Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white),
+        trailing: const Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white),
         onTap: () {
           Navigator.push(
             context,
@@ -301,6 +307,7 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
+
 
   Widget _buildReservaCard() {
     return Card(
