@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../db_test.dart';
+import '../../BaseDBHelper.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -10,7 +11,7 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final DBHelper dbHelper = DBHelper();
+  final UsuarioDBHelper dbHelper = UsuarioDBHelper();
   int? userId; // Definimos userId como una variable de instancia
 
   @override

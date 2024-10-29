@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../db_test.dart';
+import '../dbHelper/dbHelperUsuario.dart';
 import '../models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,7 +13,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController dniController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final DBHelper dbHelper = DBHelper();
+  final UsuarioDBHelper _dbHelperUsuario = UsuarioDBHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     // Intentamos obtener el usuario desde la base de datos
-    var userData = await dbHelper.loginUser(dni, password);
+    var userData = await _dbHelperUsuario.loginUser(dni, password);
     if (userData != null) {
       final userId = userData['id'];
       // Guardamos el userId en SharedPreferences

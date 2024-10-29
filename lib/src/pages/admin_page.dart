@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 import 'dart:io';
 
-import '../../db_test.dart';
+import '../../BaseDBHelper.dart';
 import 'asistencia_page.dart';
 
 class AdminPage extends StatefulWidget {
@@ -13,7 +14,7 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
-  final DBHelper _dbHelper = DBHelper();
+  final UsuarioDBHelper _dbHelper = UsuarioDBHelper();
   File? _image;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _searchController = TextEditingController();

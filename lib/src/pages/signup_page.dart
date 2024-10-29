@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../db_test.dart';
+import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -29,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
         dni.isNotEmpty &&
         email.isNotEmpty &&
         password.isNotEmpty) {
-      await DBHelper().insertUser({
+      await UsuarioDBHelper().insertUser({
         'first_name': firstName,
         'last_name': lastName,
         'dni': dni,

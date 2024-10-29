@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lemon/src/dbHelper/dbHelperPlan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../db_test.dart';
+import '../../BaseDBHelper.dart';
 import 'confirmacion_page.dart';
 
 class SelectPlanPage extends StatefulWidget {
@@ -11,7 +12,7 @@ class SelectPlanPage extends StatefulWidget {
 }
 
 class _SelectPlanPageState extends State<SelectPlanPage> {
-  final DBHelper _dbHelper = DBHelper();
+  final PlanDBHelper _plandbHelper = PlanDBHelper();
   List<Map<String, dynamic>> _plans = [];
 
   @override
@@ -21,7 +22,7 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
   }
 
   Future<void> _loadPlans() async {
-    var plans = await _dbHelper.getPlans();
+    var plans = await _plandbHelper.getPlans();
     setState(() {
       _plans = plans;
     });

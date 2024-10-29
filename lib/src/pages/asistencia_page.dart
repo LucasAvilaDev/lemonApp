@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../db_test.dart';
+import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
+
+import '../dbHelper/dbHelperSuscripciones.dart';
 
 class AsistenciaPage extends StatelessWidget {
-  final DBHelper dbHelper = DBHelper();
+  final UsuarioDBHelper _usuarioDBHelper = UsuarioDBHelper();
+  final SubscriptionDBHelper _subscriptionDBHelper = SubscriptionDBHelper();
+
   final int userId;
 
   AsistenciaPage({super.key, required this.userId});
@@ -16,7 +20,7 @@ class AsistenciaPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<Map<String, Object?>?>(
-          future: dbHelper.getUserById(
+          future: _usuarioDBHelper.getUserById(
               userId), // Llamamos al método para obtener el usuario
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -58,7 +62,7 @@ class AsistenciaPage extends StatelessWidget {
                     onPressed: () async {
                       // Decrementar las clases restantes del usuario
                       bool success =
-                          await dbHelper.decrementUserClasses(userId);
+                          await _subscriptionDBHelper.decrementUserClasses(userId);
                       if (success) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

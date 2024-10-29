@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../db_test.dart';
+import '../../BaseDBHelper.dart';
+import '../dbHelper/dbHelperPlan.dart';
 
 class ConfirmPurchasePage extends StatelessWidget {
   final int planId; // Agregamos planId
@@ -112,7 +113,7 @@ class ConfirmPurchasePage extends StatelessWidget {
 
   Future<void> _associatePlanToUser(int userId, int planId) async {
     // Aquí llamas a tu método para asociar el plan al usuario en la base de datos
-    final dbHelper = DBHelper();
+    final dbHelper = PlanDBHelper();
     await dbHelper.associatePlanToUser(userId, planId);
   }
 

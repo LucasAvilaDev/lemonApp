@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lemon/src/dbHelper/dbHelperReservas.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../db_test.dart';
 import 'package:intl/intl.dart';
+
+import '../dbHelper/dbHelperHorario.dart';
 
 class ProgramacionClasesPage extends StatefulWidget {
   const ProgramacionClasesPage({super.key});
@@ -11,7 +13,9 @@ class ProgramacionClasesPage extends StatefulWidget {
 }
 
 class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
-  final DBHelper _dbHelper = DBHelper();
+  final HorarioDBHelper _horariodbHelper = HorarioDBHelper();
+  final ReservasDBHelper _reservasdbHelper = ReservasDBHelper();
+
   List<Map<String, String>> _weekDates = [];
   final Map<String, List<Map<String, dynamic>>> _availableTimes =
       {}; // Se asegura de que sea un Map de fechas a listas de mapas con horarios
@@ -27,7 +31,7 @@ class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
   for (var day in _weekDates) {
     String dayOfWeek =
         DateFormat('EEEE', 'es').format(DateTime.parse(day["date"]!));
-    var availableTimes = await _dbHelper.getAvailableSchedules(dayOfWeek);
+    var availableTimes = await _horariodbHelper.getAvailableSchedules(dayOfWeek);
 
     print("Horarios disponibles para $dayOfWeek: $availableTimes");
 
@@ -102,7 +106,7 @@ class _ProgramacionClasesPageState extends State<ProgramacionClasesPage> {
   );
 
   if (confirmed == true) {
-    await _dbHelper.insertReservation(
+    await _reservasdbHelper.insertReservation(
         userId!, scheduleId, selectedDate, selectedTime);
     
     // Eliminar el horario reservado
