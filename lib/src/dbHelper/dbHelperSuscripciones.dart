@@ -39,19 +39,21 @@ class SubscriptionDBHelper extends BaseDBHelper{
         where: 'id = ?', whereArgs: [subscriptionId]);
   }
 
-  Future<Map<String, dynamic>?> getActiveSubscription(int userId) async {
-    final db = await database;
+Future<Map<String, dynamic>?> getActiveSubscription(int userId) async {
+  final db = await database;
 
-    // Obtener la suscripción más reciente basada en la fecha de expiración
-    var result = await db.query(
-      'subscription',
-      where: 'user_id = ?',
-      whereArgs: [userId],
-      orderBy: 'expiration_date DESC',
-      limit: 1,
-    );
+  // Obtener la suscripción más reciente basada en la fecha de expiración
+  var result = await db.query(
+    'subscription',
+    where: 'user_id = ?',
+    whereArgs: [userId],
+    orderBy: 'expiration_date DESC',
+    limit: 1,
+  );
 
-    return result.isNotEmpty ? result.first : null;
-  }
+  // Devolver el primer resultado como un mapa de datos o null si está vacío
+  return result.isNotEmpty ? result.first as Map<String, dynamic> : null;
+}
+
 
 }

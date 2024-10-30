@@ -57,7 +57,7 @@ class RecomendacionesWidget extends StatelessWidget {
                 
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 4,
                     child: Padding(

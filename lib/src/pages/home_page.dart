@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lemon/src/dbHelper/dbHelperSuscripciones.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../BaseDBHelper.dart';
 import '../dbHelper/dbHelperUsuario.dart';
 import '../widgets/SectionTitle.dart';
 import '../widgets/recomendacions_carousel.dart';
 import '../widgets/reserva_card.dart';
+import '../widgets/mis_clases_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,10 +18,18 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final UsuarioDBHelper _dbHelperUsuario = UsuarioDBHelper();
+  final SubscriptionDBHelper _dbHelperSuscription = SubscriptionDBHelper();
+
   Map<String, dynamic>? suscripciones;
   int _clasesTotales = 0;
   int _clasesRestantes = 0;
   bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadSubscriptionData();
+  }
 
   Future<int?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -41,27 +52,37 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> loadSubscriptionData() async {
+    setState(() => isLoading = true);
+    int? userId = await getUserId();
+    if (userId == null) return;
+
+    var subscription = await _dbHelperSuscription.getActiveSubscription(userId);
+    if (subscription != null) {
+      setState(() {
+        suscripciones = subscription;
+        _clasesTotales = subscription['total_classes'] ?? 0;
+        _clasesRestantes = subscription['remaining_classes'] ?? 0;
+      });
+    }
+    setState(() => isLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.grey[200],
-        elevation: 0,
         title: FutureBuilder<String>(
           future: getUserName(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text('Cargando...', style: TextStyle(color: Colors.black87));
+              return const Text('Cargando...');
             } else if (snapshot.hasError) {
-              return const Text('Error al cargar', style: TextStyle(color: Colors.red));
+              return const Text('Error al cargar');
             } else if (snapshot.hasData) {
-              return Text(
-                '¡Hola, ${snapshot.data}!',
-                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-              );
+              return Text('¡Hola, ${snapshot.data}!');
             } else {
-              return const Text('Usuario no encontrado', style: TextStyle(color: Colors.red));
+              return const Text('Usuario no encontrado');
             }
           },
         ),
@@ -72,10 +93,7 @@ class HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.pushNamed(context, 'userProfile');
               },
-              child: const CircleAvatar(
-                backgroundColor: Colors.blueGrey,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
+              child: const CircleAvatar(child: Icon(Icons.person)),
             ),
           ),
         ],
@@ -86,23 +104,20 @@ class HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : MisClasesCard(
+                      suscripciones: suscripciones,
+                      clasesTotales: _clasesTotales,
+                      clasesRestantes: _clasesRestantes,
+                    ),
+              const SizedBox(height: 16),
               const SectionTitle(title: 'Programa tus próximos entrenamientos'),
-              const SizedBox(height: 8),
-              Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                color: Colors.white,
-                elevation: 3,
-                child: const ReservaCard(),
-              ),
-              const SizedBox(height: 24),
+              const ReservaCard(),
+              const SizedBox(height: 16),
               const SectionTitle(title: 'Recomendaciones'),
-              const SizedBox(height: 8),
-              Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                color: Colors.white,
-                elevation: 3,
-                child: const RecomendacionesCarousel(),
-              ),
+              const SizedBox(height: 16),
+              const RecomendacionesCarousel(),
             ],
           ),
         ),

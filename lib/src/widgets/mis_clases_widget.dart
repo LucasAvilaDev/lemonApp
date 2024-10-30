@@ -5,34 +5,96 @@ class MisClasesCard extends StatelessWidget {
   final Map<String, dynamic>? suscripciones;
   final int clasesTotales;
   final int clasesRestantes;
-  final BuildContext context;
 
   const MisClasesCard({
-    Key? key,
-    required this.suscripciones,
-    required this.clasesTotales,
-    required this.clasesRestantes,
-    required this.context,
-  }) : super(key: key);
+    super.key,
+    this.suscripciones,
+    this.clasesTotales = 0,
+    this.clasesRestantes = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final TextStyle titleStyle = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: Colors.grey[800],
+    );
+
+    final TextStyle infoStyle = TextStyle(
+      fontSize: 16,
+      color: Colors.grey[600],
+    );
+
     if (suscripciones == null) {
       return Card(
-        color: Colors.grey[200],
         elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'No tienes suscripciones activas',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text('No tienes suscripciones activas', style: titleStyle),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SelectPlanPage(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    
+                    backgroundColor: const Color(0xFF13212E),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Comprar clases', style: TextStyle(color: Colors.white)),
+                ),]
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Mis Clases', style: titleStyle),
+            const SizedBox(height: 8),
+            Text('$clasesRestantes clases de $clasesTotales disponibles', style: infoStyle),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                minHeight: 6,
+                value: clasesTotales > 0 ? clasesRestantes / clasesTotales : 0,
+                backgroundColor: Colors.grey[400],
+                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF13212E)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -43,57 +105,13 @@ class MisClasesCard extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF13212E),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 child: const Text('Comprar clases', style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Card(
-      color: Colors.grey[200],
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Mis Clases',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(
-              minHeight: 8,
-              value: clasesTotales > 0 ? clasesRestantes / clasesTotales : 0,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF13212E)),
-            ),
-            const SizedBox(height: 16),
-            Text('$clasesRestantes disponibles de $clasesTotales'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SelectPlanPage(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF13212E),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('Comprar clases', style: TextStyle(color: Colors.white)),
+              ),]
             ),
           ],
         ),

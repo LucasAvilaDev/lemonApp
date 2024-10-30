@@ -92,4 +92,6 @@ class UsuarioDBHelper extends BaseDBHelper {
 
     return null; // Si no se encontró el usuario, retornamos null
   }
+
+  
 }

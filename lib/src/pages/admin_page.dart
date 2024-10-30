@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 import 'dart:io';
-
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../BaseDBHelper.dart';
 import 'asistencia_page.dart';
 
@@ -19,10 +19,7 @@ class _AdminPageState extends State<AdminPage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _searchController = TextEditingController();
   String? _searchedDNI;
-  Map<String, dynamic>?
-      _userData; // Variable para almacenar los datos del usuario buscado
-  String?
-      _errorMessage; // Variable para almacenar mensajes de error si no se encuentra el usuario
+  String? _errorMessage;
 
   // Método para abrir la cámara
   Future<void> _openCamera() async {
@@ -37,16 +34,14 @@ class _AdminPageState extends State<AdminPage> {
   Future<void> _searchUser() async {
     setState(() {
       _searchedDNI = _searchController.text;
-      _userData = null; // Reinicia los datos previos
-      _errorMessage = null; // Reinicia cualquier mensaje de error
+      _errorMessage = null;
     });
 
     try {
       var userData = await _dbHelper.getUserByDni(_searchedDNI!);
 
       if (userData.isNotEmpty) {
-        int userId = userData.first['id']; // Asegúrate de que sea un int
-        // Al hacer tap, navegamos a AsistenciaPage pasando el userId
+        int userId = userData.first['id'];
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -62,6 +57,14 @@ class _AdminPageState extends State<AdminPage> {
         _errorMessage = 'Error al buscar el usuario: $e';
       });
     }
+  }
+
+  void _onScannerResult(BarcodeCapture barcode) {
+    final String code = barcode.barcodes.first.rawValue ?? '';
+    setState(() {
+      _searchedDNI = code; // Asignar el código escaneado al controlador de búsqueda
+    });
+    _searchUser(); // Llamar al método de búsqueda
   }
 
   @override
@@ -91,29 +94,53 @@ class _AdminPageState extends State<AdminPage> {
             // Botón de búsqueda
             ElevatedButton(
               onPressed: _searchUser,
-              style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
               child: const Text('Buscar'),
-              
             ),
 
             const SizedBox(height: 20),
 
             // Botón para escanear QR
             ElevatedButton(
-              onPressed: _openCamera,
-              style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
+              onPressed: () {
+                // Mostrar el escáner QR
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Escanear Código QR'),
+                      content: SizedBox(
+                        height: 300,
+                        child: MobileScanner(
+                          onDetect: (BarcodeCapture barcode) {
+                            _onScannerResult(barcode);
+                            Navigator.of(context).pop(); // Cerrar el diálogo al escanear
+                          },
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Cerrar'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
               child: const Text('Escanear QR'),
             ),
+            
+            // Mensaje de error si no se encuentra el usuario
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
           ],
         ),
       ),

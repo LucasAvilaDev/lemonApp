@@ -21,6 +21,8 @@ class LemonApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Lemon Training Center',
       theme: ThemeData(
+      fontFamily: 'Roboto', // Cambia 'Roboto' por la fuente deseada
+
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF13212E),
           brightness: Brightness.light, // Forzamos el brillo claro

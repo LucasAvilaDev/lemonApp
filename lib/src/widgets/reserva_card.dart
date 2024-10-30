@@ -9,14 +9,14 @@ class ReservaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: Colors.blue[700],
       child: ListTile(
         title: const Text(
-          'Programar semana',
+          'Programar entrenamiento',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
             color: Colors.white,
           ),
         ),
