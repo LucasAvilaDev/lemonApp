@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lemon/src/dbHelper/dbHelperSuscripciones.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../BaseDBHelper.dart';
 import '../dbHelper/dbHelperUsuario.dart';
 import '../widgets/SectionTitle.dart';
 import '../widgets/recomendacions_carousel.dart';

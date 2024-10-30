@@ -1,6 +1,5 @@
 import 'package:lemon/BaseDBHelper.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 import '../models/scheduled_model.dart';
 

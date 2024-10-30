@@ -38,7 +38,7 @@ class _BottomBarState extends State<BottomBar> {
   final List<Widget> _pages = [
     const HomePage(),
     const MiCredencialPage(),
-    ScheduledClassesPage()
+    const ScheduledClassesPage()
   ];
 
   @override

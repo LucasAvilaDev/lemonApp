@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../BaseDBHelper.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});

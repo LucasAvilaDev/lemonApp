@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../BaseDBHelper.dart';
 import '../dbHelper/dbHelperPlan.dart';
 
 class ConfirmPurchasePage extends StatelessWidget {

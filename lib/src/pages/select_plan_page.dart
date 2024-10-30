@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lemon/src/dbHelper/dbHelperPlan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../BaseDBHelper.dart';
 import 'confirmacion_page.dart';
 
 class SelectPlanPage extends StatefulWidget {

@@ -3,7 +3,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 import 'dart:io';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../BaseDBHelper.dart';
 import 'asistencia_page.dart';
 
 class AdminPage extends StatefulWidget {
@@ -138,7 +137,7 @@ class _AdminPageState extends State<AdminPage> {
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Text(
                   _errorMessage!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
           ],
