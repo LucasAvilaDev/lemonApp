@@ -19,8 +19,8 @@ class _AdminPageState extends State<AdminPage> {
   final TextEditingController _searchController = TextEditingController();
   String? _searchedDNI;
   String? _errorMessage;
+  bool _isScanning = false; // Para controlar si estamos escaneando
 
-  // Método para abrir la cámara
   Future<void> _openCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
@@ -32,7 +32,6 @@ class _AdminPageState extends State<AdminPage> {
 
   Future<void> _searchUser() async {
     setState(() {
-      _searchedDNI = _searchController.text;
       _errorMessage = null;
     });
 
@@ -62,6 +61,7 @@ class _AdminPageState extends State<AdminPage> {
     final String code = barcode.barcodes.first.rawValue ?? '';
     setState(() {
       _searchedDNI = code; // Asignar el código escaneado al controlador de búsqueda
+      _isScanning = false; // Terminar el escaneo
     });
     _searchUser(); // Llamar al método de búsqueda
   }
@@ -72,77 +72,60 @@ class _AdminPageState extends State<AdminPage> {
       appBar: AppBar(
         title: const Text('Administrador'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Barra de búsqueda
-            TextField(
-              keyboardType: TextInputType.number,
-              controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Buscar usuario por DNI',
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.search),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Botón de búsqueda
-            ElevatedButton(
-              onPressed: _searchUser,
-              child: const Text('Buscar'),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Botón para escanear QR
-            ElevatedButton(
-              onPressed: () {
-                // Mostrar el escáner QR
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text('Escanear Código QR'),
-                      content: SizedBox(
-                        height: 300,
-                        child: MobileScanner(
-                          onDetect: (BarcodeCapture barcode) {
-                            _onScannerResult(barcode);
-                            Navigator.of(context).pop(); // Cerrar el diálogo al escanear
-                          },
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Cerrar'),
-                        ),
-                      ],
-                    );
-                  },
-                );
+      body: _isScanning 
+          ? MobileScanner(
+              onDetect: (BarcodeCapture barcode) {
+                _onScannerResult(barcode);
               },
-              child: const Text('Escanear QR'),
-            ),
-            
-            // Mensaje de error si no se encuentra el usuario
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Barra de búsqueda
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      labelText: 'Buscar usuario por DNI',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Botón de búsqueda
+                  ElevatedButton(
+                    onPressed: _searchUser,
+                    child: const Text('Buscar'),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Botón para escanear QR
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _isScanning = true; // Iniciar escaneo
+                      });
+                    },
+                    child: const Text('Escanear QR'),
+                  ),
+
+                  // Mensaje de error si no se encuentra el usuario
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                ],
               ),
-          ],
-        ),
-      ),
+            ),
     );
   }
 }

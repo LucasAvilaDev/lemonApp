@@ -51,7 +51,7 @@ class _MiCredencialPageState extends State<MiCredencialPage> {
                 ? QrImageView(
                     data: qrData,
                     version: QrVersions.auto,
-                    size: 150.0,
+                    size: 300.0,
                   )
                 : const CircularProgressIndicator(), // Muestra un indicador de carga si qrData está vacío
             const SizedBox(height: 20),
