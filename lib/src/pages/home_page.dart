@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lemon/src/dbHelper/SuscripcionesDBHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../dbHelper/PlanDBHelper.dart';
 import '../dbHelper/UsuarioDBHelper.dart';
 import '../widgets/SectionTitle.dart';
 import '../widgets/recomendacions_carousel.dart';
@@ -18,6 +19,8 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final UsuarioDBHelper _dbHelperUsuario = UsuarioDBHelper();
   final SubscriptionDBHelper _dbHelperSuscription = SubscriptionDBHelper();
+  final PlanDBHelper _dbHelperPlan = PlanDBHelper();
+
 
   Map<String, dynamic>? suscripciones;
   int _clasesTotales = 0;
@@ -52,20 +55,45 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> loadSubscriptionData() async {
-    setState(() => isLoading = true);
-    int? userId = await getUserId();
-    if (userId == null) return;
+  setState(() => isLoading = true);
+  int? userId = await getUserId();
+  if (userId == null) return;
 
-    var subscription = await _dbHelperSuscription.getActiveSubscription(userId);
-    if (subscription != null) {
-      setState(() {
-        suscripciones = subscription;
-        _clasesTotales = subscription['total_classes'] ?? 0;
-        _clasesRestantes = subscription['remaining_classes'] ?? 0;
-      });
-    }
-    setState(() => isLoading = false);
+  var subscription = await _dbHelperSuscription.getActiveSubscription(userId);
+  if (subscription != null) {
+    setState(() {
+      // Almacena la suscripción obtenida
+      suscripciones = subscription;
+      // Obtiene el ID del plan asociado a la suscripción
+      int? planId = subscription['plan_id']; // Asegúrate de que este campo exista en la suscripción
+      if (planId != null) {
+        // Llama al método para obtener el plan y sus clases totales
+        _loadPlanData(planId);
+      } else {
+        // Manejo si no hay plan asociado
+        _clasesTotales = 0; 
+      }
+      // Inicializa las clases restantes
+      _clasesRestantes = subscription['remaining_classes'] ?? 0;
+    });
   }
+  setState(() => isLoading = false);
+}
+
+// Método auxiliar para cargar datos del plan
+Future<void> _loadPlanData(int planId) async {
+  var plan = await _dbHelperPlan.getPlanById(planId);
+  if (plan != null) {
+    setState(() {
+      // Actualiza el total de clases con el class_quantity del plan
+      _clasesTotales = plan['class_quantity'] ?? 0;
+    });
+  } else {
+    // Manejo si no se encuentra el plan
+    _clasesTotales = 0; 
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {

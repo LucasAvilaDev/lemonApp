@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../dbHelper/UsuarioDBHelper.dart';
 import 'asistencia_page.dart';
+import 'clientes_asistencia_page.dart';
 import 'select_plan_page.dart'; // Importar la página de selección de plan
 
 class AdminPage extends StatefulWidget {
@@ -33,14 +34,14 @@ class _AdminPageState extends State<AdminPage> {
 
   Future<void> _searchUser() async {
     setState(() {
-      _errorMessage = null;
+      _errorMessage = null; // Reinicia el mensaje de error
     });
 
     try {
-      var userData = await _dbHelper.getUserByDni(_searchedDNI!);
+      var userData = await _dbHelper.getUserByDni(_searchedDNI!); // Obtiene el usuario por DNI
 
-      if (userData.isNotEmpty) {
-        int userId = userData.first['id'];
+      if (userData != null) { // Verifica si se encontró el usuario
+        int userId = userData['id']; // Accede directamente al mapa
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -48,12 +49,12 @@ class _AdminPageState extends State<AdminPage> {
         );
       } else {
         setState(() {
-          _errorMessage = 'No se encontró el usuario con el DNI $_searchedDNI';
+          _errorMessage = 'No se encontró el usuario con el DNI $_searchedDNI'; // Mensaje si no se encuentra el usuario
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error al buscar el usuario: $e';
+        _errorMessage = 'Error al buscar el usuario: $e'; // Mensaje de error
       });
     }
   }
@@ -131,6 +132,21 @@ class _AdminPageState extends State<AdminPage> {
                       );
                     },
                     child: const Text('Cargar abono'),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Botón para ver asistencia de hoy
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AttendingClientsPage(),
+                        ),
+                      );
+                    },
+                    child: const Text('Ver asistencia de hoy'),
                   ),
 
                   // Mensaje de error si no se encuentra el usuario

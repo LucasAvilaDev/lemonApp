@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lemon/src/dbHelper/PlanDBHelper.dart';
+import 'package:lemon/src/dbHelper/UsuarioDBHelper.dart'; // Importa tu DBHelper para usuarios
 import 'package:shared_preferences/shared_preferences.dart';
-import 'confirmacion_page.dart';
 
 class SelectPlanPage extends StatefulWidget {
   const SelectPlanPage({super.key});
@@ -12,8 +12,10 @@ class SelectPlanPage extends StatefulWidget {
 
 class _SelectPlanPageState extends State<SelectPlanPage> {
   final PlanDBHelper _plandbHelper = PlanDBHelper();
-  final TextEditingController _userIdController = TextEditingController();
+  final UsuarioDBHelper _userDbHelper = UsuarioDBHelper(); // Inicializa el DBHelper para usuarios
+  final TextEditingController _dniController = TextEditingController();
   List<Map<String, dynamic>> _plans = [];
+  int? _userId; // Almacena el ID del usuario encontrado
 
   @override
   void initState() {
@@ -28,18 +30,37 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
     });
   }
 
+  Future<void> _searchUserByDni(String dni) async {
+  var user = await _userDbHelper.getUserByDni(dni); // Busca el usuario por DNI
+  if (user != null) {
+    setState(() {
+      _userId = user['id']; // Almacena el ID del usuario encontrado
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Usuario encontrado exitosamente')),
+    );
+  } else {
+    setState(() {
+      _userId = null; // Si no se encuentra, resetea el ID
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('No se encontró ningún usuario con ese DNI')),
+    );
+  }
+}
+
+
   Future<void> _associatePlanToUser(int planId) async {
-    final userId = int.tryParse(_userIdController.text);
-    if (userId == null) {
+    if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, ingrese un ID de usuario válido')),
+        const SnackBar(content: Text('Por favor, seleccione un usuario primero')),
       );
       return;
     }
 
-    await _plandbHelper.associatePlanToUser(userId, planId);
+    await _plandbHelper.associatePlanToUser(_userId!, planId);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Abono asociado exitosamente al usuario')),
+      const SnackBar(content: Text('Abono asociado exitosamente al usuario')),
     );
   }
 
@@ -55,10 +76,26 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
         child: Column(
           children: [
             TextField(
-              controller: _userIdController,
-              decoration: InputDecoration(labelText: 'ID del Usuario'),
+              controller: _dniController,
+              decoration: const InputDecoration(labelText: 'DNI del Usuario'),
               keyboardType: TextInputType.number,
             ),
+            ElevatedButton(
+              onPressed: () async {
+                String dni = _dniController.text.trim();
+                if (dni.isNotEmpty) {
+                  await _searchUserByDni(dni);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Por favor, ingrese un DNI válido')),
+                  );
+                }
+              },
+              child: const Text('Buscar Usuario'),
+            ),
+            const SizedBox(height: 16),
+            Text('ID del Usuario: ${_userId != null ? _userId.toString() : 'No encontrado'}'),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: _plans.length,
@@ -92,16 +129,6 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
         borderRadius: BorderRadius.circular(15),
         onTap: () async {
           await _associatePlanToUser(planId);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ConfirmPurchasePage(
-                planId: planId,
-                abono: title,
-                price: price,
-              ),
-            ),
-          );
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),

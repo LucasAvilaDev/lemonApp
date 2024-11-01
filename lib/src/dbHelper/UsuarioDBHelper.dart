@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:lemon/BaseDBHelper.dart';
 import 'package:sqflite/sqlite_api.dart';
 
@@ -29,11 +30,13 @@ class UsuarioDBHelper extends BaseDBHelper {
     );
   }
   
-  // Método para obtener usuario por DNI
-  Future<List<Map<String, dynamic>>> getUserByDni(String dni) async {
-    final db = await database;
-    return await db.query('users', where: 'dni = ?', whereArgs: [dni]);
-  }
+// Método para obtener usuario por DNI
+Future<Map<String, dynamic>?> getUserByDni(String dni) async {
+  final db = await database;
+  final List<Map<String, dynamic>> result = await db.query('users', where: 'dni = ?', whereArgs: [dni]);
+  return result.isNotEmpty ? result.first : null; // Retorna el primer resultado o null si no hay resultados
+}
+
 
   // Método para obtener usuario por id
   Future<Map<String, Object?>?> getUserById(int id) async {
@@ -92,6 +95,24 @@ class UsuarioDBHelper extends BaseDBHelper {
 
     return null; // Si no se encontró el usuario, retornamos null
   }
+
+  Future<List<Map<String, dynamic>>> getUsersAttendingToday() async {
+  // Aquí asumiendo que tienes una tabla de reservas que contiene la fecha de las reservas.
+  // Asegúrate de ajustar la consulta a tu esquema de base de datos.
+
+  final today = DateTime.now();
+  String formattedDate = DateFormat('yyyy-MM-dd').format(today); // Formato de fecha para la consulta
+
+  final db = await database; // Asumiendo que tienes un método para obtener la base de datos
+  final List<Map<String, dynamic>> results = await db.rawQuery(
+    'SELECT u.dni, u.first_name FROM users u '
+    'JOIN user_reservations r ON u.id = r.user_id '
+    'WHERE r.reservation_date = ?',
+    [formattedDate],
+  );
+  print(results);
+  return results;
+}
 
   
 }
