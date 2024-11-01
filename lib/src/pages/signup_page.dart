@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
+
+import '../dbHelper/UsuarioDBHelper.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:lemon/src/dbHelper/dbHelperReservas.dart';
+import 'package:lemon/src/dbHelper/ReservasDBHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-import '../dbHelper/dbHelperHorario.dart';
+import '../dbHelper/HorarioDBHelper.dart';
+
 
 class ProgramacionClasesPage extends StatefulWidget {
   const ProgramacionClasesPage({super.key});

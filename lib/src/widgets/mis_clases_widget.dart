@@ -92,28 +92,7 @@ class MisClasesCard extends StatelessWidget {
                 valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF13212E)),
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SelectPlanPage(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF13212E),
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text('Comprar clases', style: TextStyle(color: Colors.white)),
-              ),]
-            ),
-          ],
+            ],
         ),
       ),
     );

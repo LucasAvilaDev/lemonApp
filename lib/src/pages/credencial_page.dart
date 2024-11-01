@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qr_flutter/qr_flutter.dart'; // Importa el paquete qr_flutter
-import '../dbHelper/dbHelperUsuario.dart';
+import '../dbHelper/UsuarioDBHelper.dart';
 
 class MiCredencialPage extends StatefulWidget {
   const MiCredencialPage({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lemon/src/dbHelper/dbHelperSuscripciones.dart';
+import 'package:lemon/src/dbHelper/SuscripcionesDBHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../dbHelper/dbHelperUsuario.dart';
+import '../dbHelper/UsuarioDBHelper.dart';
 import '../widgets/SectionTitle.dart';
 import '../widgets/recomendacions_carousel.dart';
 import '../widgets/reserva_card.dart';

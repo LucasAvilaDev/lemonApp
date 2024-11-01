@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lemon/src/dbHelper/dbHelperPlan.dart';
+import 'package:lemon/src/dbHelper/PlanDBHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'confirmacion_page.dart';
 
@@ -12,6 +12,7 @@ class SelectPlanPage extends StatefulWidget {
 
 class _SelectPlanPageState extends State<SelectPlanPage> {
   final PlanDBHelper _plandbHelper = PlanDBHelper();
+  final TextEditingController _userIdController = TextEditingController();
   List<Map<String, dynamic>> _plans = [];
 
   @override
@@ -27,26 +28,54 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
     });
   }
 
+  Future<void> _associatePlanToUser(int planId) async {
+    final userId = int.tryParse(_userIdController.text);
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor, ingrese un ID de usuario válido')),
+      );
+      return;
+    }
+
+    await _plandbHelper.associatePlanToUser(userId, planId);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Abono asociado exitosamente al usuario')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Seleccionar Plan'),
-        backgroundColor: Colors.teal, // Color de la barra superior
+        backgroundColor: Colors.teal,
       ),
-      body: ListView.builder(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        itemCount: _plans.length,
-        itemBuilder: (context, index) {
-          var plan = _plans[index];
-          return _buildPlanCard(
-            context,
-            plan['name'],
-            plan['class_quantity'],
-            plan['price'],
-            plan['id'],
-          );
-        },
+        child: Column(
+          children: [
+            TextField(
+              controller: _userIdController,
+              decoration: InputDecoration(labelText: 'ID del Usuario'),
+              keyboardType: TextInputType.number,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _plans.length,
+                itemBuilder: (context, index) {
+                  var plan = _plans[index];
+                  return _buildPlanCard(
+                    context,
+                    plan['name'],
+                    plan['class_quantity'],
+                    plan['price'],
+                    plan['id'],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -57,11 +86,12 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      color: Colors.teal[50], // Fondo suave para la tarjeta
+      color: Colors.teal[50],
       margin: const EdgeInsets.symmetric(vertical: 12.0),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
-        onTap: () {
+        onTap: () async {
+          await _associatePlanToUser(planId);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -80,7 +110,7 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.fitness_center, color: Colors.teal, size: 30), // Icono temático
+                  const Icon(Icons.fitness_center, color: Colors.teal, size: 30),
                   const SizedBox(width: 10),
                   Text(
                     'Plan: $title',
@@ -134,10 +164,5 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
         ),
       ),
     );
-  }
-
-  Future<int?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('userId');
   }
 }

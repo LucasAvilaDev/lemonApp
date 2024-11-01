@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 
-import '../dbHelper/dbHelperSuscripciones.dart';
+import '../dbHelper/SuscripcionesDBHelper.dart';
+import '../dbHelper/UsuarioDBHelper.dart';
 
 class AsistenciaPage extends StatelessWidget {
   final UsuarioDBHelper _usuarioDBHelper = UsuarioDBHelper();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../dbHelper/dbHelperHorario.dart';
-import '../dbHelper/dbHelperReservas.dart';
+import '../dbHelper/HorarioDBHelper.dart';
+import '../dbHelper/ReservasDBHelper.dart';
 import '../models/scheduled_model.dart';
 
 class ScheduledClassesPage extends StatefulWidget {

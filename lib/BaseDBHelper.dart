@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'src/dbHelper/dbHelperHorario.dart';
-import 'src/dbHelper/dbHelperPlan.dart';
-import 'src/dbHelper/dbHelperReservas.dart';
-import 'src/dbHelper/dbHelperSuscripciones.dart';
-import 'src/dbHelper/dbHelperUsuario.dart';
+import 'src/dbHelper/HorarioDBHelper.dart';
+import 'src/dbHelper/PlanDBHelper.dart';
+import 'src/dbHelper/ReservasDBHelper.dart';
+import 'src/dbHelper/SuscripcionesDBHelper.dart';
+import 'src/dbHelper/UsuarioDBHelper.dart';
 
 abstract class BaseDBHelper {
   Database? _database;

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lemon/src/dbHelper/dbHelperUsuario.dart';
 import 'dart:io';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../dbHelper/UsuarioDBHelper.dart';
 import 'asistencia_page.dart';
+import 'select_plan_page.dart'; // Importar la página de selección de plan
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -93,6 +94,9 @@ class _AdminPageState extends State<AdminPage> {
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.search),
                     ),
+                    onChanged: (value) {
+                      _searchedDNI = value;
+                    },
                   ),
                   const SizedBox(height: 10),
 
@@ -112,6 +116,21 @@ class _AdminPageState extends State<AdminPage> {
                       });
                     },
                     child: const Text('Escanear QR'),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Botón para cargar abono
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SelectPlanPage(),
+                        ),
+                      );
+                    },
+                    child: const Text('Cargar abono'),
                   ),
 
                   // Mensaje de error si no se encuentra el usuario
