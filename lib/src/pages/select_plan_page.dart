@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lemon/src/dbHelper/PlanDBHelper.dart';
-import 'package:lemon/src/dbHelper/UsuarioDBHelper.dart'; // Importa tu DBHelper para usuarios
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lemon/src/dbHelper/UsuarioDBHelper.dart';
+
+import '../dbHelper/SuscripcionesDBHelper.dart'; // Importa tu DBHelper para usuarios
 
 class SelectPlanPage extends StatefulWidget {
   const SelectPlanPage({super.key});
@@ -13,6 +14,7 @@ class SelectPlanPage extends StatefulWidget {
 class _SelectPlanPageState extends State<SelectPlanPage> {
   final PlanDBHelper _plandbHelper = PlanDBHelper();
   final UsuarioDBHelper _userDbHelper = UsuarioDBHelper(); // Inicializa el DBHelper para usuarios
+  final SubscriptionDBHelper _subscriptionDbHelper = SubscriptionDBHelper(); // Inicializa el DBHelper para usuarios
   final TextEditingController _dniController = TextEditingController();
   List<Map<String, dynamic>> _plans = [];
   int? _userId; // Almacena el ID del usuario encontrado
@@ -51,18 +53,37 @@ class _SelectPlanPageState extends State<SelectPlanPage> {
 
 
   Future<void> _associatePlanToUser(int planId) async {
-    if (_userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, seleccione un usuario primero')),
-      );
-      return;
-    }
-
-    await _plandbHelper.associatePlanToUser(_userId!, planId);
+  if (_userId == null) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abono asociado exitosamente al usuario')),
+      const SnackBar(content: Text('Por favor, seleccione un usuario primero')),
     );
+    return;
   }
+
+  // Verificar si el usuario ya tiene un abono activo
+final activeSubscription = await _subscriptionDbHelper.getActiveSubscription(_userId!);
+
+if (activeSubscription != null) {
+  // Convertir expiration_date de String a DateTime
+  final expirationDateString = activeSubscription['expiration_date'] as String;
+  final expirationDate = DateTime.parse(expirationDateString);
+
+  if (expirationDate.isAfter(DateTime.now())) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('El usuario ya tiene un abono activo')),
+    );
+    return;
+  }
+}
+
+
+  // Asociar el plan si no tiene un abono activo
+  await _plandbHelper.associatePlanToUser(_userId!, planId);
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Abono asociado exitosamente al usuario')),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

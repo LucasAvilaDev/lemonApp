@@ -1,17 +1,80 @@
-import 'package:flutter/material.dart';
-import '../pages/select_plan_page.dart';
+// mis_clases_widget.dart
 
-class MisClasesCard extends StatelessWidget {
-  final Map<String, dynamic>? suscripciones;
-  final int clasesTotales;
-  final int clasesRestantes;
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../dbHelper/PlanDBHelper.dart';
+import '../dbHelper/SuscripcionesDBHelper.dart';
+import '../dbHelper/UsuarioDBHelper.dart';
+
+class MisClasesCard extends StatefulWidget {
+  final UsuarioDBHelper usuarioDBHelper;
+  final SubscriptionDBHelper suscriptionDBHelper;
+  final PlanDBHelper planDBHelper;
 
   const MisClasesCard({
     super.key,
-    this.suscripciones,
-    this.clasesTotales = 0,
-    this.clasesRestantes = 0,
+    required this.usuarioDBHelper,
+    required this.suscriptionDBHelper,
+    required this.planDBHelper,
   });
+
+  @override
+  _MisClasesCardState createState() => _MisClasesCardState();
+}
+
+class _MisClasesCardState extends State<MisClasesCard> {
+  Map<String, dynamic>? suscripciones;
+  int clasesTotales = 0;
+  int clasesRestantes = 0;
+  DateTime? fechaVencimiento;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadSubscriptionData();
+  }
+
+  Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId');
+  }
+
+  Future<void> loadSubscriptionData() async {
+    setState(() => isLoading = true);
+    int? userId = await getUserId();
+    if (userId == null) return;
+
+    var subscription = await widget.suscriptionDBHelper.getActiveSubscription(userId);
+    if (subscription != null) {
+      setState(() {
+        suscripciones = subscription;
+        clasesRestantes = subscription['remaining_classes'] ?? 0;
+        fechaVencimiento = DateTime.parse(subscription['expiration_date']); // Ajusta el campo según la BD
+
+        int? planId = subscription['plan_id'];
+        if (planId != null) {
+          _loadPlanData(planId);
+        } else {
+          clasesTotales = 0;
+        }
+      });
+    }
+    setState(() => isLoading = false);
+  }
+
+  Future<void> _loadPlanData(int planId) async {
+    var plan = await widget.planDBHelper.getPlanById(planId);
+    if (plan != null) {
+      setState(() {
+        clasesTotales = plan['class_quantity'] ?? 0;
+      });
+    } else {
+      clasesTotales = 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +88,10 @@ class MisClasesCard extends StatelessWidget {
       fontSize: 16,
       color: Colors.grey[600],
     );
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     if (suscripciones == null) {
       return Card(
@@ -63,13 +130,18 @@ class MisClasesCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
-                minHeight: 6,
+                minHeight: 8,
                 value: clasesTotales > 0 ? clasesRestantes / clasesTotales : 0,
                 backgroundColor: Colors.grey[400],
                 valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF13212E)),
               ),
             ),
-            ],
+            const SizedBox(height: 8),
+            Text(
+              'Tu abono vence el: ${fechaVencimiento != null ? DateFormat('dd/MM/yyyy').format(fechaVencimiento!) : "Sin abono activo"}',
+              style: infoStyle,
+            ),
+          ],
         ),
       ),
     );

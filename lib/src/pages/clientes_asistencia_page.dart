@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../dbHelper/SuscripcionesDBHelper.dart';
 import '../dbHelper/UsuarioDBHelper.dart';
 
 class AttendingClientsPage extends StatelessWidget {
@@ -27,7 +27,20 @@ class AttendingClientsPage extends StatelessWidget {
                 final client = snapshot.data![index];
                 return ListTile(
                   title: Text(client['first_name']),
-                  subtitle: Text('Dni: ${client['dni']}'),
+                  subtitle: Text('DNI: ${client['dni']}'),
+                  trailing: ElevatedButton(
+                    onPressed: () async {
+                      bool success = await SubscriptionDBHelper().decrementUserClasses(client['id']);
+                      String message = success
+                          ? 'Clase confirmada para ${client['first_name']}.'
+                          : 'No hay clases restantes para ${client['first_name']}.';
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(message)),
+                      );
+                    },
+                    child: const Text('Confirmar'),
+                  ),
                 );
               },
             );

@@ -23,14 +23,12 @@ class HomePageState extends State<HomePage> {
 
 
   Map<String, dynamic>? suscripciones;
-  int _clasesTotales = 0;
-  int _clasesRestantes = 0;
   bool isLoading = true;
+  
 
   @override
   void initState() {
     super.initState();
-    loadSubscriptionData();
   }
 
   Future<int?> getUserId() async {
@@ -54,45 +52,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> loadSubscriptionData() async {
-  setState(() => isLoading = true);
-  int? userId = await getUserId();
-  if (userId == null) return;
-
-  var subscription = await _dbHelperSuscription.getActiveSubscription(userId);
-  if (subscription != null) {
-    setState(() {
-      // Almacena la suscripción obtenida
-      suscripciones = subscription;
-      // Obtiene el ID del plan asociado a la suscripción
-      int? planId = subscription['plan_id']; // Asegúrate de que este campo exista en la suscripción
-      if (planId != null) {
-        // Llama al método para obtener el plan y sus clases totales
-        _loadPlanData(planId);
-      } else {
-        // Manejo si no hay plan asociado
-        _clasesTotales = 0; 
-      }
-      // Inicializa las clases restantes
-      _clasesRestantes = subscription['remaining_classes'] ?? 0;
-    });
-  }
-  setState(() => isLoading = false);
-}
-
-// Método auxiliar para cargar datos del plan
-Future<void> _loadPlanData(int planId) async {
-  var plan = await _dbHelperPlan.getPlanById(planId);
-  if (plan != null) {
-    setState(() {
-      // Actualiza el total de clases con el class_quantity del plan
-      _clasesTotales = plan['class_quantity'] ?? 0;
-    });
-  } else {
-    // Manejo si no se encuentra el plan
-    _clasesTotales = 0; 
-  }
-}
+ 
 
 
   @override
@@ -125,30 +85,30 @@ Future<void> _loadPlanData(int planId) async {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : MisClasesCard(
-                      suscripciones: suscripciones,
-                      clasesTotales: _clasesTotales,
-                      clasesRestantes: _clasesRestantes,
-                    ),
-              const SizedBox(height: 16),
-              const SectionTitle(title: 'Programa tus próximos entrenamientos'),
-              const ReservaCard(),
-              const SizedBox(height: 16),
-              const SectionTitle(title: 'Recomendaciones'),
-              const SizedBox(height: 16),
-              const RecomendacionesCarousel(),
-            ],
-          ),
+      // En HomePage
+body: SingleChildScrollView(
+  child: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MisClasesCard(
+          usuarioDBHelper: _dbHelperUsuario,
+          suscriptionDBHelper: _dbHelperSuscription,
+          planDBHelper: _dbHelperPlan,
         ),
-      ),
+        const SizedBox(height: 16),
+        const SectionTitle(title: 'Programa tus próximos entrenamientos'),
+        const ReservaCard(),
+        const SizedBox(height: 16),
+        const SectionTitle(title: 'Recomendaciones'),
+        const SizedBox(height: 16),
+        const RecomendacionesCarousel(),
+      ],
+    ),
+  ),
+),
+
     );
   }
 }

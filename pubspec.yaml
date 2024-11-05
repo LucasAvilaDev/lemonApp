@@ -31,9 +31,9 @@ flutter:
       fonts:
         - asset: assets/fonts/BlackHanSans-Regular.ttf
   assets:
-    - assets\images\lemon_logo.png
-    - assets\images\lemon_home.png
-    - assets\images\lemon_transparente.png
-    - assets\images\qrcode.png
+    - assets/images/lemon_logo.png
+    - assets/images/lemon_home.png
+    - assets/images/lemon_transparente.png
+    - assets/images/qrcode.png
     - assets/week_schedule.json
 
