@@ -1,8 +1,14 @@
+
 import 'package:flutter/material.dart';
 
-class RecomendacionesWidget extends StatelessWidget {
-  const RecomendacionesWidget({super.key});
+class CarouselPage extends StatefulWidget {
+  const CarouselPage({super.key});
 
+  @override
+  _CarouselPageState createState() => _CarouselPageState();
+}
+
+class _CarouselPageState extends State<CarouselPage> {
   final List<Map<String, String>> recomendaciones = const [
     {
       'title': 'Principio de Continuidad',
@@ -30,62 +36,86 @@ class RecomendacionesWidget extends StatelessWidget {
     },
   ];
 
+  late PageController _controller;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: 0, viewportFraction: 1.0);
+    // Empezar el bucle después de un breve retraso.
+    Future.delayed(const Duration(milliseconds: 600), _startInfiniteLoop);
+  }
+
+  // Función para iniciar el bucle infinito.
+  void _startInfiniteLoop() {
+    if (_currentPage == recomendaciones.length - 1) {
+      _controller.jumpToPage(0);  // Regresar al primer elemento
+      _currentPage = 0;
+    } else {
+      _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+      _currentPage++;
+    }
+    // Llamar nuevamente para crear el ciclo infinito
+    Future.delayed(const Duration(seconds: 5), _startInfiniteLoop);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 200),
-          child: PageView.builder(
-            controller: PageController(
-              viewportFraction: 0.80,
-              initialPage:
-                  0, // Asegúrate de que el carrusel comience en la primera tarjeta
-            ),
-            clipBehavior: Clip.none, // Evita que se recorten las tarjetas
-            itemCount: recomendaciones.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                
-                onTap: () {
-                  showDetalleRecomendacionDialog(
-                    context,
-                    recomendaciones[index]['title']!,
-                    recomendaciones[index]['details']!,
-                  );
-                },
-                
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            recomendaciones[index]['title']!,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            recomendaciones[index]['description']!,
-                            style: const TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+        constraints: const BoxConstraints(maxHeight: 200),
+        child: PageView.builder(
+          controller: _controller,
+          clipBehavior: Clip.none, // Evita que se recorten las tarjetas
+          itemCount: null, // Esto hace que el PageView sea infinito
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                showDetalleRecomendacionDialog(
+                  context,
+                  recomendaciones[index % recomendaciones.length]['title']!,
+                  recomendaciones[index % recomendaciones.length]['details']!,
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        recomendaciones[index % recomendaciones.length]['title']!,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      Text(
+                        recomendaciones[index % recomendaciones.length]['description']!,
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-              );
-            },
-          )),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
 
