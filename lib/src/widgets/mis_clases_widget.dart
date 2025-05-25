@@ -1,5 +1,5 @@
 // mis_clases_widget.dart
-
+/*
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,12 +55,8 @@ class _MisClasesCardState extends State<MisClasesCard> {
         fechaVencimiento = DateTime.parse(subscription['expiration_date']); // Ajusta el campo según la BD
 
         int? planId = subscription['plan_id'];
-        if (planId != null) {
-          _loadPlanData(planId);
-        } else {
-          clasesTotales = 0;
-        }
-      });
+        _loadPlanData(planId);
+            });
     }
     setState(() => isLoading = false);
   }
@@ -147,3 +143,5 @@ class _MisClasesCardState extends State<MisClasesCard> {
     );
   }
 }
+
+*/

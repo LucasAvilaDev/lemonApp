@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lemon/src/pages/home_page.dart';
 import 'routes/routes.dart';
-import 'src/pages/login_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
@@ -37,7 +37,7 @@ class LemonApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system, // Se ajusta al tema del sistema
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }
